@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 كل حاجة متعلقة بـ"تفاصيل المادة الفعالة" - endpoint واحد: هات كل تفاصيل
-مادة فعالة بكودها (pubchem_cid).
+مادة فعالة بكودها (pubchem_cid)، بالإضافة لكل الأسماء التجارية اللي
+بتستخدمها.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,8 +10,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Ingredient, IngredientDetail
-from schemas.active_ingredient import ActiveIngredientResponse
+from models import Drug, DrugIngredient, Ingredient, IngredientDetail
+from schemas.active_ingredient import ActiveIngredientResponse, TradeNameUsingIngredient
 
 router = APIRouter(prefix="/active_ingredient", tags=["active_ingredient"])
 
@@ -28,8 +29,12 @@ def get_by_pubchem_cid(pubchem_cid: str, db: Session = Depends(get_db)):
         select(IngredientDetail).where(IngredientDetail.pubchem_cid == pubchem_cid)
     ).scalar_one_or_none()
 
-    # لو الفحص لسه ماوصلش للمادة دي (details = None)، برضو نرجّع رد
-    # منطقي بدل ما نرمي خطأ - كل حقول التفاصيل هتبقى None
+    used_in_drugs = db.execute(
+        select(Drug)
+        .join(DrugIngredient, DrugIngredient.drug_id == Drug.id)
+        .where(DrugIngredient.pubchem_cid == pubchem_cid)
+    ).scalars().all()
+
     return ActiveIngredientResponse(
         pubchem_cid=ingredient.pubchem_cid,
         chembl_id=ingredient.chembl_id,
@@ -49,4 +54,8 @@ def get_by_pubchem_cid(pubchem_cid: str, db: Session = Depends(get_db)):
         chembl_target_id=details.chembl_target_id if details else None,
         chembl_target_name=details.chembl_target_name if details else None,
         chembl_target_type=details.chembl_target_type if details else None,
+        used_in=[
+            TradeNameUsingIngredient(trade_name=d.trade_name, manufacturer=d.manufacturer)
+            for d in used_in_drugs
+        ],
     )
