@@ -14,8 +14,16 @@ class IngredientSummary(BaseModel):
     display_name: str
 
 
+class AlternativeDrug(BaseModel):
+    """دواء تاني عنده بالظبط نفس مجموعة المواد الفعالة (مش بس مادة
+    مشتركة واحدة)."""
+    trade_name: str
+    manufacturer: str
+
+
 class TradeNameResponse(BaseModel):
     trade_name: str
     manufacturer: str
     drug_class: str
     active_ingredients: list[IngredientSummary]
+    alternatives: list[AlternativeDrug]

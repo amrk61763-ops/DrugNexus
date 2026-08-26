@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 شكل الرد (response) الخاص بـendpoint تفاصيل المادة الفعالة - كل الحقول
-اللي جبناها من PubChem و ChEMBL (جدول ingredient_details).
+اللي جبناها من PubChem و ChEMBL (جدول ingredient_details)، بالإضافة لقائمة
+الأسماء التجارية اللي بتستخدم المادة دي.
 """
 
 from pydantic import BaseModel
+
+
+class TradeNameUsingIngredient(BaseModel):
+    trade_name: str
+    manufacturer: str
 
 
 class ActiveIngredientResponse(BaseModel):
@@ -28,3 +34,5 @@ class ActiveIngredientResponse(BaseModel):
     chembl_target_id: str | None
     chembl_target_name: str | None
     chembl_target_type: str | None
+
+    used_in: list[TradeNameUsingIngredient]
