@@ -9,9 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from database import get_db
-from models import Drug, DrugIngredient, Ingredient, IngredientDetail
-from schemas.active_ingredient import ActiveIngredientResponse, TradeNameUsingIngredient
+from .database import get_db
+from .models import Drug, DrugIngredient, Ingredient, IngredientDetail
+from .schemas.active_ingredient import ActiveIngredientResponse, TradeNameUsingIngredient
 
 router = APIRouter(prefix="/active_ingredient", tags=["active_ingredient"])
 
