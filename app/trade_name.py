@@ -17,9 +17,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from database import get_db
-from models import Drug, DrugIngredient, Ingredient
-from schemas.trade_name import AlternativeDrug, IngredientSummary, TradeNameResponse
+from .database import get_db
+from .models import Drug, DrugIngredient, Ingredient
+from .schemas.trade_name import AlternativeDrug, IngredientSummary, TradeNameResponse
 
 router = APIRouter(prefix="/trade_name", tags=["trade_name"])
 
