@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import active_ingredient, trade_name
 
-app = FastAPI(title="Nexa Bio API")
+app = FastAPI(title="DrugNexus API")
 
 # CORS: بيسمح للفرونت اند (على دومين مختلف زي Cloudflare Pages مثلاً)
 # إنه يكلم الـAPI ده. من غيره، المتصفح بيرفض الرد حتى لو السيرفر
