@@ -1,17 +1,25 @@
 # -*- coding: utf-8 -*-
 """
 كل حاجة متعلقة بـ"البحث بالاسم التجاري":
-  - بحث جزئي، غير حساس لحالة الأحرف (مش لازم تكتب الاسم والجرعة كاملين)
+  - بحث جزئي، غير حساس لحالة الأحرف
   - لكل نتيجة: مواده الفعالة + بدائل (أدوية تانية بنفس المجموعة بالظبط)
+
+ملحوظة أداء مهمة: _find_exact_alternatives كانت بتعمل استعلام منفصل
+لكل "مرشح بديل" (N+1 pattern) - شغال بسرعة على SQLite محلي، لكن على
+Neon الحقيقي كل استعلام رحلة شبكة كاملة، فلو مادة فعالة موجودة في
+100 دواء، كانت بتعمل 100 رحلة شبكة بالتتابع = دقايق انتظار، وأحيانًا
+Vercel بيقفل الطلب بعد 10 ثواني (خطة مجانية) فيظهر "Failed to fetch".
+الحل: استعلام SQL واحد بـGROUP BY/HAVING بدل اللوب - نفس النتيجة
+المنطقية بالظبط، لكن رحلتين شبكة بس مهما كان عدد المرشحين.
 """
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from .database import get_db
-from .models import Drug, DrugIngredient, Ingredient
-from .schemas.trade_name import AlternativeDrug, IngredientSummary, TradeNameResponse
+from database import get_db
+from models import Drug, DrugIngredient, Ingredient
+from schemas.trade_name import AlternativeDrug, IngredientSummary, TradeNameResponse
 
 router = APIRouter(prefix="/trade_name", tags=["trade_name"])
 
@@ -21,33 +29,43 @@ MAX_RESULTS = 20
 def _find_exact_alternatives(
     db: Session, drug_id: int, ingredient_cids: set[str]
 ) -> list[AlternativeDrug]:
-    """يلاقي أدوية تانية عندها بالظبط نفس مجموعة المواد الفعالة - مش بس
-    مادة مشتركة واحدة. لو Augmentin فيه [Amoxicillin+Clavulanic Acid]،
-    بديله الصح لازم يحتوي الاتنين بالظبط، مش Amoxicillin لوحدها.
-
-    ملحوظة أداء: بنعمل استعلام واحد لكل "مرشح" (candidate) - مقبول تمامًا
-    على حجم قاعدتنا الحالي (آلاف الصفوف، كل استعلام أقل من 1ms). لو
-    القاعدة كبرت لملايين الصفوف يومًا ما، ده يستاهل يتحول لاستعلام SQL
-    واحد بـGROUP BY/HAVING بدل اللوب."""
+    """يلاقي أدوية تانية عندها بالظبط نفس مجموعة المواد الفعالة -
+    استعلام واحد بدل استعلام لكل مرشح."""
 
     if not ingredient_cids:
         return []
 
-    # مرشحين أوليين: أي دواء بيشارك مادة واحدة على الأقل
-    candidate_ids = db.execute(
-        select(DrugIngredient.drug_id)
+    target_count = len(ingredient_cids)
+
+    # لكل دواء تاني: كام مادة من مواده بتتقاطع مع مجموعتنا المستهدفة
+    matching = (
+        select(
+            DrugIngredient.drug_id.label("drug_id"),
+            func.count().label("matching_count"),
+        )
         .where(DrugIngredient.pubchem_cid.in_(ingredient_cids))
         .where(DrugIngredient.drug_id != drug_id)
-        .distinct()
-    ).scalars().all()
+        .group_by(DrugIngredient.drug_id)
+        .subquery()
+    )
 
-    exact_match_ids = []
-    for cand_id in candidate_ids:
-        cand_cids = set(db.execute(
-            select(DrugIngredient.pubchem_cid).where(DrugIngredient.drug_id == cand_id)
-        ).scalars().all())
-        if cand_cids == ingredient_cids:  # مطابقة تامة للمجموعة، مش تقاطع بس
-            exact_match_ids.append(cand_id)
+    # إجمالي عدد مواد كل دواء (عشان نستبعد اللي عنده مواد زيادة عن
+    # المطلوب - يعني تقاطع بس مش تطابق كامل)
+    totals = (
+        select(
+            DrugIngredient.drug_id.label("drug_id"),
+            func.count().label("total_count"),
+        )
+        .group_by(DrugIngredient.drug_id)
+        .subquery()
+    )
+
+    exact_match_ids = db.execute(
+        select(matching.c.drug_id)
+        .join(totals, totals.c.drug_id == matching.c.drug_id)
+        .where(matching.c.matching_count == target_count)
+        .where(totals.c.total_count == target_count)
+    ).scalars().all()
 
     if not exact_match_ids:
         return []
@@ -64,8 +82,6 @@ def _find_exact_alternatives(
 
 @router.get("/{trade_name}", response_model=list[TradeNameResponse])
 def search_by_trade_name(trade_name: str, db: Session = Depends(get_db)):
-    # ILIKE = بحث نصي غير حساس لحالة الأحرف في Postgres، و% حوالين
-    # الكلمة = مش لازم الاسم كامل، أي جزء منه كافي
     drugs = db.execute(
         select(Drug)
         .where(Drug.trade_name.ilike(f"%{trade_name}%"))
