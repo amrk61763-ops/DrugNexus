@@ -11,7 +11,7 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database import Base
+from .database import Base
 
 
 class Drug(Base):
