@@ -8,8 +8,7 @@
 """
 
 from fastapi import FastAPI
-from vulcan import Vulcan
-import active_ingredient, trade_name
+from . import active_ingredient, trade_name
 
 
 app = FastAPI(title="DrugNexus API")
@@ -21,5 +20,3 @@ app.include_router(active_ingredient.router)
 @app.get("/")
 def root():
     return {"status": "شغال", "docs": "/docs"}
-
-handler = Vulcan(app)
