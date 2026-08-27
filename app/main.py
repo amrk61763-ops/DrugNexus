@@ -10,7 +10,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import active_ingredient, trade_name
+from . import active_ingredient, trade_name
 
 app = FastAPI(title="Nexa Bio API")
 
