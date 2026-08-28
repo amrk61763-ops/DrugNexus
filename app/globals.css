@@ -3,21 +3,21 @@
 @theme inline {
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
-  --color-background: #f6f9fc;
-  --color-foreground: #102a43;
-  --color-card: #ffffff;
-  --color-card-foreground: #102a43;
-  --color-primary: #1769aa;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #eaf4fb;
-  --color-secondary-foreground: #1769aa;
-  --color-muted: #edf3f7;
-  --color-muted-foreground: #627d98;
-  --color-accent: #d9f3ef;
-  --color-accent-foreground: #087f78;
-  --color-border: #d9e4ec;
-  --color-input: #d9e4ec;
-  --color-ring: #5aa9d6;
+  --color-background: #f7f4ee;
+  --color-foreground: #172b3a;
+  --color-card: #fffdf9;
+  --color-card-foreground: #172b3a;
+  --color-primary: #174a70;
+  --color-primary-foreground: #fffdf9;
+  --color-secondary: #e8eef0;
+  --color-secondary-foreground: #174a70;
+  --color-muted: #eef0ed;
+  --color-muted-foreground: #64727a;
+  --color-accent: #cfe5df;
+  --color-accent-foreground: #17645c;
+  --color-border: #d8ddd9;
+  --color-input: #d8ddd9;
+  --color-ring: #72a9a2;
   --radius: 0.8rem;
 }
 
