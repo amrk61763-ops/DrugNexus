@@ -6,8 +6,8 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: "DrugNexus | Clinical intelligence, connected",
-  description: "A focused workspace for exploring medicines, ingredients, and therapeutic alternatives.",
+  title: "Drug Nexus | Explore the science behind the drug",
+  description: "A trusted scientific reference platform connecting trade names, active ingredients, chemistry, and structural evidence.",
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
