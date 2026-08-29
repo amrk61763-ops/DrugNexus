@@ -1,10 +1,21 @@
+# -*- coding: utf-8 -*-
+"""
+كل حاجة متعلقة بـ"تفاصيل المادة الفعالة" - endpoint واحد: هات كل تفاصيل
+مادة فعالة بكودها (pubchem_cid)، بالإضافة لكل الأسماء التجارية اللي
+بتستخدمها.
+"""
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .models import Ingredient, IngredientDetail
-from .schemas.active_ingredient import ActiveIngredientResponse.
+from .models import Drug, DrugIngredient, Ingredient, IngredientDetail
+from .schemas.active_ingredient import ActiveIngredientResponse, TradeNameUsingIngredient
+
+router = APIRouter(
+    prefix="/active_ingredient", tags=["active_ingredient"]
+)
 
 @router.get("/{display_name}", response_model=ActiveIngredientResponse)
 def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
@@ -24,8 +35,7 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         select(IngredientDetail).where(IngredientDetail.pubchem_cid == pubchem_cid)
     ).scalar_one_or_none()
 
-    # 4. Use the pubchem_cid to find drugs using this ingredient
-    # Fetch ALL drugs with this ingredient first
+    # 4. Fetch ALL drugs containing this ingredient
     all_drugs = db.execute(
         select(Drug)
         .join(DrugIngredient, DrugIngredient.drug_id == Drug.id)
@@ -34,31 +44,33 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
 
     # 5. Process drugs to extract the base name (prefix) and remove duplicates
     # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
-    # We'll use a set to store unique base names
-    unique_drugs = {}
-    
-    import re
-    
+    # We use a dictionary to store unique base names and keep the first occurrence's manufacturer
+    unique_drugs_map = {}
+
     for drug in all_drugs:
         trade_name = drug.trade_name
-        # Remove common dosage suffixes (numbers, mg, ml, g, etc.)
-        # This regex removes everything after the first non-letter character sequence if it looks like a dosage
-        # Or simply split by space and take the first word
-        
-        # Simple approach: Take the first word (prefix)
-        base_name_parts = trade_name.split()
-        if not base_name_parts:
+        if not trade_name:
             continue
             
-        # If the first part is the brand name, use it
-        base_name = base_name_parts[0]
-        
-        # Store only unique base names
-        if base_name not in unique_drugs:
-            unique_drugs[base_name] = drug
+        # Split by space to get the first word (the base name/prefix)
+        # e.g., "Augmentin 1g" -> ["Augmentin", "1g"] -> "Augmentin"
+        base_name = trade_name.split()[0]
 
-    # Convert back to list
-    filtered_drugs = list(unique_drugs.values())
+        # Only add if we haven't seen this base name yet
+        if base_name not in unique_drugs_map:
+            unique_drugs_map[base_name] = {
+                "trade_name": base_name,
+                "manufacturer": drug.manufacturer
+            }
+
+    # Convert the map back to a list of objects for the response
+    used_in_list = [
+        TradeNameUsingIngredient(
+            trade_name=data["trade_name"],
+            manufacturer=data["manufacturer"]
+        )
+        for data in unique_drugs_map.values()
+    ]
 
     return ActiveIngredientResponse(
         pubchem_cid=pubchem_cid,
@@ -79,11 +91,5 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         chembl_target_id=details.chembl_target_id if details else None,
         chembl_target_name=details.chembl_target_name if details else None,
         chembl_target_type=details.chembl_target_type if details else None,
-        used_in=[
-            TradeNameUsingIngredient(
-                trade_name=unique_drugs[d.trade_name.split()[0]], # Show the base name
-                manufacturer=d.manufacturer
-            )
-            for d in filtered_drugs
-        ],
+        used_in=used_in_list,
     )
