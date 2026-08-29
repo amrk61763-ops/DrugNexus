@@ -1,8 +1,3 @@
-"""
-كل حاجة متعلقة بـ"تفاصيل المادة الفعالة" - endpoint واحد: هات كل تفاصيل
-مادة فعالة بكودها (pubchem_cid).
-"""
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
