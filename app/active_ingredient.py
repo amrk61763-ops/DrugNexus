@@ -1,4 +1,15 @@
-# ... imports ...
+"""
+كل حاجة متعلقة بـ"تفاصيل المادة الفعالة" - endpoint واحد: هات كل تفاصيل
+مادة فعالة بكودها (pubchem_cid).
+"""
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from .database import get_db
+from .models import Ingredient, IngredientDetail
+from .schemas.active_ingredient import ActiveIngredientResponse.
 
 @router.get("/{display_name}", response_model=ActiveIngredientResponse)
 def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
