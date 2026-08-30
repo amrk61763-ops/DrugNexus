@@ -20,8 +20,8 @@ router = APIRouter(
 @router.get("/{display_name}", response_model=ActiveIngredientResponse)
 def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
     # 1. Search for the ingredient by display_name
-    ingredient = db.execute(
-        select(Ingredient).where(Ingredient.display_name == display_name)
+ ingredient = db.execute(
+        select(Ingredient).where(Ingredient.display_name.ilike(f"%{display_name}%"))
     ).scalar_one_or_none()
 
     if ingredient is None:
