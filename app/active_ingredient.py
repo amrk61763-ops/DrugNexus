@@ -10,8 +10,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .models import Drug, DrugIngredient, Ingredient, IngredientDetail
-from .schemas.active_ingredient import ActiveIngredientResponse, TradeNameUsingIngredient
+from .models import Drug, DrugIngredient, Ingredient, IngredientDetail, PdbLigand, PdbReceptor
+from .schemas.active_ingredient import (
+    ActiveIngredientResponse,
+    LigandFile,
+    ReceptorStructure,
+    TradeNameUsingIngredient,
+)
 
 router = APIRouter(
     prefix="/active_ingredient", tags=["active_ingredient"]
@@ -41,6 +46,42 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         .join(DrugIngredient, DrugIngredient.drug_id == Drug.id)
         .where(DrugIngredient.pubchem_cid == pubchem_cid)
     ).scalars().all()
+
+        # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
+    receptors = db.execute(
+        select(PdbReceptor).where(PdbReceptor.pubchem_cid == pubchem_cid)
+    ).scalars().all()
+
+    pdb_structures: list[ReceptorStructure] = []
+
+    if receptors:
+        receptor_pdb_ids = [r.pdb_id for r in receptors]
+
+        # استعلام واحد لكل الـligands بتوع كل الـreceptors مع بعض
+        # (بدل استعلام منفصل لكل receptor - نفس فلسفة trade_name.py)
+        all_ligands = db.execute(
+            select(PdbLigand).where(PdbLigand.pdb_id.in_(receptor_pdb_ids))
+        ).scalars().all()
+
+        ligands_by_pdb_id: dict[str, list[PdbLigand]] = {}
+        for lig in all_ligands:
+            ligands_by_pdb_id.setdefault(lig.pdb_id, []).append(lig)
+
+        pdb_structures = [
+            ReceptorStructure(
+                pdb_id=r.pdb_id,
+                receptor_file_name=r.receptor_file_name,
+                download_url=r.receptor_blob_url,
+                ligands=[
+                    LigandFile(
+                        ligand_file_name=l.ligand_file_name,
+                        download_url=l.ligand_blob_url,
+                    )
+                    for l in ligands_by_pdb_id.get(r.pdb_id, [])
+                ],
+            )
+            for r in receptors
+        ]
 
     # 5. Process drugs to extract the base name (prefix) and remove duplicates
     # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
@@ -92,4 +133,5 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         chembl_target_name=details.chembl_target_name if details else None,
         chembl_target_type=details.chembl_target_type if details else None,
         used_in=used_in_list,
+        pdb_structures=pdb_structures,
     )
