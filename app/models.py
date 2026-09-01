@@ -61,6 +61,26 @@ class IngredientDetail(Base):
     chembl_target_name: Mapped[str | None] = mapped_column()
     chembl_target_type: Mapped[str | None] = mapped_column()
 
+class PdbReceptor(Base):
+    __tablename__ = "pdb_receptors"
+
+    pdb_id: Mapped[str] = mapped_column(primary_key=True)
+    pubchem_cid: Mapped[str] = mapped_column(ForeignKey("ingredients.pubchem_cid"))
+    receptor_file_name: Mapped[str] = mapped_column()
+    receptor_blob_pathname: Mapped[str] = mapped_column()
+    receptor_blob_url: Mapped[str | None] = mapped_column()
+
+
+class PdbLigand(Base):
+    """مفيش id مستقل - زي DrugIngredient، بنستخدم (pdb_id + ligand_file_name)
+    مع بعض كـprimary key وصفي بس (composite key)."""
+    __tablename__ = "pdb_ligands"
+
+    pdb_id: Mapped[str] = mapped_column(ForeignKey("pdb_receptors.pdb_id"), primary_key=True)
+    ligand_file_name: Mapped[str] = mapped_column(primary_key=True)
+    ligand_blob_pathname: Mapped[str] = mapped_column()
+    ligand_blob_url: Mapped[str | None] = mapped_column()
+
 
 if __name__ == "__main__":
     # تشغيل الملف مباشرة (مش عن طريق FastAPI) بيوريك إن الوصف اتقرا صح
