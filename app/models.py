@@ -65,7 +65,7 @@ class PdbReceptor(Base):
     __tablename__ = "pdb_receptors"
 
     pdb_id: Mapped[str] = mapped_column(primary_key=True)
-    pubchem_cid: Mapped[str] = mapped_column(ForeignKey("ingredients.pubchem_cid"))
+    pubchem_cid: Mapped[str] = mapped_column("pubchem_cids")  # اسم العمود الحقيقي في القاعدة فيه s
     receptor_file_name: Mapped[str] = mapped_column()
     receptor_blob_pathname: Mapped[str] = mapped_column()
     receptor_blob_url: Mapped[str | None] = mapped_column()
