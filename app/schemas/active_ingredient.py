@@ -12,6 +12,17 @@ class TradeNameUsingIngredient(BaseModel):
     trade_name: str
     manufacturer: str
 
+class LigandFile(BaseModel):
+    ligand_file_name: str
+    download_url: str | None
+
+
+class ReceptorStructure(BaseModel):
+    pdb_id: str
+    receptor_file_name: str
+    download_url: str | None
+    ligands: list[LigandFile]
+
 
 class ActiveIngredientResponse(BaseModel):
     pubchem_cid: str
@@ -34,5 +45,7 @@ class ActiveIngredientResponse(BaseModel):
     chembl_target_id: str | None
     chembl_target_name: str | None
     chembl_target_type: str | None
+    
 
     used_in: list[TradeNameUsingIngredient]
+    pdb_structures: list[ReceptorStructure]
