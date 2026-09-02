@@ -22,12 +22,22 @@ router = APIRouter(
     prefix="/active_ingredient", tags=["active_ingredient"]
 )
 
+
+def _to_int(val):
+    try:
+        if val is None:
+            return None
+        return int(val)
+    except (TypeError, ValueError):
+        return None
+
+
 @router.get("/{display_name}", response_model=ActiveIngredientResponse)
 def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
-    # 1. Search for the ingredient by display_name
+    # 1. Search for the ingredient by display_name (partial, case-insensitive)
     ingredient = db.execute(
         select(Ingredient).where(Ingredient.display_name.ilike(f"%{display_name}%"))
-    ).scalar_one_or_none()
+    ).scalars().first()
 
     if ingredient is None:
         raise HTTPException(status_code=404, detail="المادة الفعالة دي مش موجودة")
@@ -47,7 +57,7 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         .where(DrugIngredient.pubchem_cid == pubchem_cid)
     ).scalars().all()
 
-        # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
+    # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
     receptors = db.execute(
         select(PdbReceptor).where(PdbReceptor.pubchem_cid == pubchem_cid)
     ).scalars().all()
@@ -71,11 +81,17 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
             ReceptorStructure(
                 pdb_id=r.pdb_id,
                 receptor_file_name=r.receptor_file_name,
-                download_url=r.receptor_blob_url,
+                resolution=getattr(r, "resolution", None),
+                experiment_method=getattr(r, "experiment_method", None),
+                download_url=getattr(r, "receptor_blob_url", None),
                 ligands=[
                     LigandFile(
                         ligand_file_name=l.ligand_file_name,
-                        download_url=l.ligand_blob_url,
+                        resolution=getattr(l, "resolution", None),
+                        rsr=_to_int(getattr(l, "rsr", None)),
+                        rscc=_to_int(getattr(l, "rscc", None)),
+                        atom_count=_to_int(getattr(l, "atom_count", None)),
+                        download_url=getattr(l, "ligand_blob_url", None),
                     )
                     for l in ligands_by_pdb_id.get(r.pdb_id, [])
                 ],
