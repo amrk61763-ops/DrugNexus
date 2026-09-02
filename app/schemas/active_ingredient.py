@@ -14,18 +14,18 @@ class TradeNameUsingIngredient(BaseModel):
 
 class LigandFile(BaseModel):
     ligand_file_name: str
-    resolution: str
-    rsr: int
-    rscc: int
-    atom_count: int
+    resolution: str | None
+    rsr: int | None
+    rscc: int | None
+    atom_count: int | None
     download_url: str | None
 
 
 class ReceptorStructure(BaseModel):
     pdb_id: str
     receptor_file_name: str
-    resolution: str
-    experiment_method: str
+    resolution: str | None
+    experiment_method: str | None
     download_url: str | None
     ligands: list[LigandFile]
 
