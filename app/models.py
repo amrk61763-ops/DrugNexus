@@ -8,7 +8,10 @@
 مباشرة (python3 models.py) وهيطبعلك أسماء الأعمدة اللي قرأها.
 """
 
-from sqlalchemy import ForeignKey, Column, Integer, String
+from typing import Any
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -61,13 +64,16 @@ class IngredientDetail(Base):
     chembl_target_name: Mapped[str | None] = mapped_column()
     chembl_target_type: Mapped[str | None] = mapped_column()
 
-# ... (top of file unchanged) ...
 
 class PdbReceptor(Base):
     __tablename__ = "pdb_receptors"
 
     pdb_id: Mapped[str] = mapped_column(primary_key=True)
-    pubchem_cid: Mapped[str] = mapped_column()  # Remove ForeignKey for now
+    # عمود pubchem_cid ده jsonb فعليًا في الداتابيز - أحيانًا رقم مفرد
+    # زي 5192، وأحيانًا array زي [967, 54684141] لو الـreceptor مرتبط
+    # بأكتر من ligand. كان متعرّف قبل كده Mapped[str] وده اللي كان بيسبب
+    # الخطأ (jsonb = character varying) لما نقارنه بـ== في active_ingredient.py.
+    pubchem_cid: Mapped[Any] = mapped_column(JSONB)
     receptor_file_name: Mapped[str] = mapped_column()
     # resolution is usually a text like "2.0 Å" -> use str | None
     resolution: Mapped[str | None] = mapped_column()
