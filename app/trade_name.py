@@ -13,7 +13,7 @@ Vercel بيقفل الطلب بعد 10 ثواني (خطة مجانية) فيظه
 المنطقية بالظبط، لكن رحلتين شبكة بس مهما كان عدد المرشحين.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,101 +21,63 @@ from .database import get_db
 from .models import Drug, DrugIngredient, Ingredient
 from .schemas.trade_name import AlternativeDrug, IngredientSummary, TradeNameResponse
 
-router = APIRouter(prefix="/trade_name", tags=["trade_name"])
-
-MAX_RESULTS = 20
-
-
-async def _find_exact_alternatives(
-    db: AsyncSession, drug_id: int, ingredient_cids: set[str]
-) -> list[AlternativeDrug]:
-    """يلاقي أدوية تانية عندها بالظبط نفس مجموعة المواد الفعالة -
-    استعلام واحد بدل استعلام لكل مرشح."""
-
-    if not ingredient_cids:
-        return []
-
-    target_count = len(ingredient_cids)
-
-    # لكل دواء تاني: كام مادة من مواده بتتقاطع مع مجموعتنا المستهدفة
-    matching = (
-        select(
-            DrugIngredient.drug_id.label("drug_id"),
-            func.count().label("matching_count"),
-        )
-        .where(DrugIngredient.pubchem_cid.in_(ingredient_cids))
-        .where(DrugIngredient.drug_id != drug_id)
-        .group_by(DrugIngredient.drug_id)
-        .subquery()
-    )
-
-    # إجمالي عدد مواد كل دواء (عشان نستبعد اللي عنده مواد زيادة عن
-    # المطلوب - يعني تقاطع بس مش تطابق كامل)
-    totals = (
-        select(
-            DrugIngredient.drug_id.label("drug_id"),
-            func.count().label("total_count"),
-        )
-        .group_by(DrugIngredient.drug_id)
-        .subquery()
-    )
-
-    result = await db.execute(
-        select(matching.c.drug_id)
-        .join(totals, totals.c.drug_id == matching.c.drug_id)
-        .where(matching.c.matching_count == target_count)
-        .where(totals.c.total_count == target_count)
-    )
-    exact_match_ids = result.scalars().all()
-
-    if not exact_match_ids:
-        return []
-
-    result = await db.execute(
-        select(Drug).where(Drug.id.in_(exact_match_ids))
-    )
-    alt_drugs = result.scalars().all()
-
-    return [
-        AlternativeDrug(trade_name=d.trade_name, manufacturer=d.manufacturer)
-        for d in alt_drugs
-    ]
-
-
 @router.get("/{trade_name}", response_model=list[TradeNameResponse])
-async def search_by_trade_name(trade_name: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(Drug)
-        .where(Drug.trade_name.ilike(f"%{trade_name}%"))
-        .limit(MAX_RESULTS)
-    )
-    drugs = result.scalars().all()
-
-    results = []
-    for drug in drugs:
+async def search_by_trade_name(
+    trade_name: str,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
         result = await db.execute(
-            select(Ingredient)
-            .join(DrugIngredient, DrugIngredient.pubchem_cid == Ingredient.pubchem_cid)
-            .where(DrugIngredient.drug_id == drug.id)
+            select(Drug)
+            .where(Drug.trade_name.ilike(f"%{trade_name}%"))
+            .limit(MAX_RESULTS)
         )
-        ingredients = result.scalars().all()
 
-        ingredient_cids = {i.pubchem_cid for i in ingredients}
-        alternatives = await _find_exact_alternatives(db, drug.id, ingredient_cids)
+        drugs = result.scalars().all()
+        results = []
 
-        results.append(TradeNameResponse(
-            trade_name=drug.trade_name,
-            manufacturer=drug.manufacturer,
-            drug_class=drug.drug_class,
-            active_ingredients=[
-                IngredientSummary(
-                    pubchem_cid=i.pubchem_cid,
-                    chembl_id=i.chembl_id,
-                    display_name=i.display_name,
+        for drug in drugs:
+            result = await db.execute(
+                select(Ingredient)
+                .join(
+                    DrugIngredient,
+                    DrugIngredient.pubchem_cid == Ingredient.pubchem_cid,
                 )
-                for i in ingredients
-            ],
-            alternatives=alternatives,
-        ))
+                .where(DrugIngredient.drug_id == drug.id)
+            )
 
-    return results
+            ingredients = result.scalars().all()
+            ingredient_cids = {i.pubchem_cid for i in ingredients}
+
+            alternatives = await _find_exact_alternatives(
+                db,
+                drug.id,
+                ingredient_cids,
+            )
+
+            results.append(
+                TradeNameResponse(
+                    trade_name=drug.trade_name,
+                    manufacturer=drug.manufacturer,
+                    drug_class=drug.drug_class,
+                    active_ingredients=[
+                        IngredientSummary(
+                            pubchem_cid=i.pubchem_cid,
+                            chembl_id=i.chembl_id,
+                            display_name=i.display_name,
+                        )
+                        for i in ingredients
+                    ],
+                    alternatives=alternatives,
+                )
+            )
+
+        return results
+
+    except Exception as error:
+        print(f"trade_name API error: {error}")
+        raise HTTPException(
+            status_code=500,
+            detail="Database request failed",
+        )
+
