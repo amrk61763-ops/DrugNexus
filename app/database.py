@@ -31,6 +31,28 @@ if DATABASE_URL.startswith("postgresql://"):
 else:
     ASYNC_DATABASE_URL = DATABASE_URL
 
+# defensive hotfix: strip unexpected 'channel_binding' kwarg before asyncpg.connect runs
+try:
+    import asyncpg
+    _asyncpg_connect_orig = asyncpg.connect
+
+    async def _asyncpg_connect_wrapper(*args, **kwargs):
+        # remove whatever is causing the TypeError if present
+        kwargs.pop("channel_binding", None)
+        # some callers might accidentally pass server_settings flattened; try to protect against that too
+        if "server_settings" in kwargs and isinstance(kwargs["server_settings"], dict):
+            # make sure we don't pass unexpected nested items as top-level kwargs
+            kwargs["server_settings"] = {
+                k: v for k, v in kwargs["server_settings"].items()
+                if k != "channel_binding"
+            }
+        return await _asyncpg_connect_orig(*args, **kwargs)
+
+    asyncpg.connect = _asyncpg_connect_wrapper
+except Exception:
+    # if asyncpg isn't importable at startup (rare), skip the hotfix
+    pass
+
 # Build connect_args conditionally so we don't pass unsupported kwargs to asyncpg.connect
 connect_args = {}
 try:
