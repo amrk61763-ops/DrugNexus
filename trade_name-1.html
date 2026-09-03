@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trade Name Search — DrugNexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#123B66', link: '#2C6EAA', teal: '#3A8F8B',
+            page: '#F7F3EA', ink: '#17202A', muted: '#66717D', line: '#DCD3BC',
+          },
+          fontFamily: {
+            sans: ['"Public Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    [x-cloak] { display: none !important; }
+    /* Thin, quiet scrollbar for the fixed-height alternatives panel */
+    .thin-scroll::-webkit-scrollbar { width: 6px; }
+    .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #DCD3BC; border-radius: 3px; }
+    .thin-scroll { scrollbar-width: thin; scrollbar-color: #DCD3BC transparent; }
+  </style>
+</head>
+
+<body class="font-sans text-ink bg-page antialiased" x-data="tradeSearch()" x-init="initFromUrl()">
+
+  <header class="sticky top-0 z-50 bg-page/95 backdrop-saturate-150 border-b border-line">
+    <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="text-lg font-bold text-deep">Drug<span class="text-teal">Nexus</span></a>
+      <a href="/" class="text-sm text-muted hover:text-deep transition-colors">← Back to Home</a>
+    </nav>
+  </header>
+
+  <main class="pb-24">
+    <div class="max-w-6xl mx-auto px-6">
+
+      <!-- ===================== SEARCH BAR ===================== -->
+      <section class="pt-14 pb-10 text-center">
+        <h1 class="text-3xl font-extrabold text-deep mb-2">Trade Name Search</h1>
+        <p class="text-muted">Search over 14,000 drugs in the Egyptian market</p>
+
+        <form @submit.prevent="search()" class="max-w-xl mx-auto mt-7 relative">
+          <input
+            type="text" x-model="query"
+            placeholder="Type a trade name… (e.g., Augmentin)"
+            class="w-full px-5 py-3.5 pr-28 bg-white border border-line rounded-xl shadow-sm text-ink placeholder-muted/70
+                   focus:outline-none focus:ring-2 focus:ring-link/40 focus:border-link transition-shadow" />
+          <button type="submit" :disabled="isLoading || !query.trim()"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2 bg-deep hover:bg-link
+                         disabled:bg-ink/20 disabled:text-muted text-white text-sm font-semibold rounded-lg transition-colors">
+            <span x-show="!isLoading">Search</span>
+            <svg x-show="isLoading" x-cloak class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </button>
+        </form>
+
+        <div class="mt-3 text-sm text-muted">
+          Try:
+          <template x-for="ex in ['Augmentin','Panadol','Coldrex','Cataflam']" :key="ex">
+            <button @click="query = ex; search()" class="text-link hover:underline mx-1" x-text="ex"></button>
+          </template>
+        </div>
+      </section>
+
+      <section x-show="!hasSearched && !isLoading" class="text-center py-20 text-muted">
+        Type a trade name above and press Enter.
+      </section>
+
+      <section x-show="isLoading" x-cloak class="grid grid-cols-1 lg:grid-cols-10 gap-6 items-start animate-pulse">
+        <div class="lg:col-span-7 bg-white border border-line rounded-xl p-8">
+          <div class="h-7 bg-line/60 rounded w-1/3 mb-6"></div>
+          <div class="h-36 bg-line/30 rounded-lg mb-4"></div>
+          <div class="h-36 bg-line/30 rounded-lg"></div>
+        </div>
+        <div class="lg:col-span-3 grid gap-4">
+          <div class="h-20 bg-white border border-line rounded-xl"></div>
+          <div class="h-20 bg-white border border-line rounded-xl"></div>
+        </div>
+      </section>
+
+      <section x-show="hasSearched && !isLoading && results.length === 0" x-cloak class="text-center py-20">
+        <h2 class="text-xl font-bold text-deep mb-2">Not found</h2>
+        <p class="text-muted">
+          "<span class="font-semibold text-ink" x-text="query"></span>" is not registered in our database.
+        </p>
+      </section>
+
+      <section x-show="hasSearched && !isLoading && results.length > 1 && !drug" x-cloak class="py-8">
+        <p class="text-sm font-semibold uppercase tracking-wide text-muted mb-4">
+          <span x-text="results.length"></span> matches — choose one
+        </p>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <template x-for="r in results" :key="r.trade_name">
+            <button @click="drug = r" class="text-left bg-white border border-line rounded-xl p-4 shadow-sm hover:border-link transition-colors">
+              <span class="font-bold text-deep" x-text="r.trade_name"></span>
+              <p class="mt-1 text-xs text-muted" x-text="r.manufacturer + ' · ' + r.drug_class"></p>
+            </button>
+          </template>
+        </div>
+      </section>
+
+      <template x-if="drug && !isLoading">
+        <section class="grid grid-cols-1 lg:grid-cols-10 gap-6 items-start py-4">
+
+          <!-- ===== MAIN (70%) ===== -->
+          <article class="lg:col-span-7 bg-white border border-line rounded-xl shadow-sm overflow-hidden">
+            <header class="p-7 border-b border-line bg-page/60">
+              <div class="flex items-center justify-between gap-3">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-deep" x-text="drug.trade_name"></h1>
+                <button x-show="results.length > 1" @click="drug = null" class="text-xs text-link hover:underline shrink-0">
+                  ← other matches
+                </button>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-white border border-line text-ink" x-text="drug.manufacturer"></span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-teal/10 border border-teal/30 text-teal font-medium" x-text="drug.drug_class"></span>
+              </div>
+            </header>
+
+            <div class="p-7 grid gap-5">
+              <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                Active Ingredients <span x-show="hasIngredientData" x-text="'(' + drug.active_ingredients.length + ')'"></span>
+              </p>
+
+              <!-- Current live /trade_name endpoint doesn't return active_ingredients yet —
+                   show that plainly rather than an empty gap that looks broken. -->
+              <p x-show="!hasIngredientData" class="text-sm text-muted bg-page/60 border border-line rounded-lg p-4">
+                Active ingredient breakdown is not available from this endpoint yet.
+              </p>
+
+              <template x-for="ing in (drug.active_ingredients || [])" :key="ing.pubchem_cid">
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-5 bg-page/60 border border-line rounded-lg p-5">
+                  <div class="sm:col-span-3 flex flex-col justify-between gap-4">
+                    <div>
+                      <h3 class="text-lg font-bold text-ink" x-text="ing.display_name"></h3>
+                      <dl class="mt-3 space-y-1.5 text-sm">
+                        <div class="flex justify-between border-b border-line pb-1.5">
+                          <dt class="text-muted">PubChem CID</dt>
+                          <dd class="font-mono text-link" x-text="ing.pubchem_cid"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                          <dt class="text-muted">ChEMBL ID</dt>
+                          <dd class="font-mono text-teal" x-text="ing.chembl_id"></dd>
+                        </div>
+                      </dl>
+                    </div>
+                    <a :href="'active_ingrediant.html?q=' + encodeURIComponent(ing.display_name)"
+                       class="self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold
+                              bg-deep text-white hover:bg-link transition-colors">
+                      Know more
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </a>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <div class="bg-white border border-line rounded-lg p-3 h-36 flex items-center justify-center overflow-hidden">
+                      <img :src="'https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=' + ing.pubchem_cid + '&t=l'"
+                           :alt="'Structure of ' + ing.display_name" class="max-h-full w-auto object-contain" loading="lazy" />
+                    </div>
+                    <p class="mt-1.5 text-[11px] text-muted text-center">Source: PubChem</p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </article>
+
+          <!-- ===== SIDEBAR (30%) — fixed height, scrollable ===== -->
+          <aside class="lg:col-span-3 lg:sticky lg:top-20">
+            <div class="bg-white border border-line rounded-xl shadow-sm p-6">
+              <h2 class="text-xs font-semibold uppercase tracking-wide text-muted mb-4">Alternative Drugs</h2>
+
+              <p x-show="!hasAlternativesData" class="text-sm text-muted">
+                Alternatives are not available from this endpoint yet.
+              </p>
+              <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-muted">
+                No alternatives in the database.
+              </p>
+
+              <div x-show="hasAlternativesData && drug.alternatives.length > 0"
+                   class="grid gap-3 max-h-[420px] overflow-y-auto pr-1 thin-scroll">
+                <template x-for="alt in (drug.alternatives || [])" :key="alt.trade_name">
+                  <button @click="query = alt.trade_name; search()"
+                          class="text-left bg-page/60 border border-line rounded-lg p-3.5 hover:border-link transition-colors">
+                    <span class="font-bold text-ink text-sm" x-text="alt.trade_name"></span>
+                    <p class="mt-0.5 text-xs text-muted" x-text="alt.manufacturer"></p>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </aside>
+
+        </section>
+      </template>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-line py-8 text-center text-sm text-muted">© 2026 DrugNexus.</footer>
+
+  <!-- ===================== LOGIC — wired to the real backend ===================== -->
+  <script>
+    const API_BASE = ''; // same-origin: frontend and API are served from the same FastAPI app
+
+    function tradeSearch() {
+      return {
+        query: '',
+        isLoading: false,
+        hasSearched: false,
+        results: [],
+        drug: null,
+
+        // The live endpoint currently returns {id, trade_name, manufacturer, drug_class}
+        // only — no active_ingredients / alternatives, even though the schema file
+        // (schemas/trade_name.py) still defines them. These getters distinguish
+        // "field not supported by this endpoint" from "supported, zero results" —
+        // the two need different messaging (see brand guide: Available/Unavailable/N-A).
+        get hasIngredientData() { return this.drug && Array.isArray(this.drug.active_ingredients); },
+        get hasAlternativesData() { return this.drug && Array.isArray(this.drug.alternatives); },
+
+        initFromUrl() {
+          const q = new URLSearchParams(window.location.search).get('q');
+          if (q) { this.query = q; this.search(); }
+        },
+
+        async search() {
+          const q = this.query.trim();
+          if (!q) return;
+
+          this.isLoading = true;
+          this.hasSearched = true;
+          this.results = [];
+          this.drug = null;
+
+          try {
+            const res = await fetch(`${API_BASE}/trade_name/${encodeURIComponent(q)}`);
+            if (!res.ok) throw new Error(`API returned ${res.status}`);
+            this.results = await res.json();
+          } catch (err) {
+            console.error('Trade name search failed:', err);
+            this.results = [];
+          }
+
+          if (this.results.length === 1) this.drug = this.results[0];
+
+          this.isLoading = false;
+        },
+      };
+    }
+  </script>
+</body>
+</html>

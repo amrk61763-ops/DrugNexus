@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Active Ingredient Search — DrugNexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#123B66', link: '#2C6EAA', teal: '#3A8F8B',
+            page: '#F7F3EA', ink: '#17202A', muted: '#66717D', line: '#DCD3BC',
+          },
+          fontFamily: {
+            sans: ['"Public Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    [x-cloak] { display: none !important; }
+    /* Thin, quiet scrollbar for the fixed-height "used in" panel */
+    .thin-scroll::-webkit-scrollbar { width: 6px; }
+    .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #DCD3BC; border-radius: 3px; }
+    .thin-scroll { scrollbar-width: thin; scrollbar-color: #DCD3BC transparent; }
+  </style>
+</head>
+
+<body class="font-sans text-ink bg-page antialiased" x-data="ingredientSearch()" x-init="initFromUrl()">
+
+  <header class="sticky top-0 z-50 bg-page/95 backdrop-saturate-150 border-b border-line">
+    <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="text-lg font-bold text-deep">Drug<span class="text-teal">Nexus</span></a>
+      <a href="/" class="text-sm text-muted hover:text-deep transition-colors">← Back to Home</a>
+    </nav>
+  </header>
+
+  <main class="pb-24">
+    <div class="max-w-6xl mx-auto px-6">
+
+      <!-- ===================== SEARCH BAR ===================== -->
+      <section class="pt-14 pb-10 text-center">
+        <h1 class="text-3xl font-extrabold text-deep mb-2">Active Ingredient Search</h1>
+        <p class="text-muted">Explore 1,700+ active ingredients with full pharmacological data</p>
+
+        <form @submit.prevent="search()" class="max-w-xl mx-auto mt-7 relative">
+          <input
+            type="text" x-model="query"
+            placeholder="Type an active ingredient… (e.g., Morphine)"
+            class="w-full px-5 py-3.5 pr-28 bg-white border border-line rounded-xl shadow-sm text-ink placeholder-muted/70
+                   focus:outline-none focus:ring-2 focus:ring-link/40 focus:border-link transition-shadow" />
+          <button type="submit" :disabled="isLoading || !query.trim()"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2 bg-deep hover:bg-link
+                         disabled:bg-ink/20 disabled:text-muted text-white text-sm font-semibold rounded-lg transition-colors">
+            <span x-show="!isLoading">Search</span>
+            <svg x-show="isLoading" x-cloak class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </button>
+        </form>
+
+        <div class="mt-3 text-sm text-muted">
+          Try:
+          <template x-for="ex in ['Morphine','Paracetamol','Amoxicillin','Caffeine']" :key="ex">
+            <button @click="query = ex; search()" class="text-link hover:underline mx-1" x-text="ex"></button>
+          </template>
+        </div>
+      </section>
+
+      <section x-show="!hasSearched && !isLoading" class="text-center py-20 text-muted">
+        Type an active ingredient name and press Enter.
+      </section>
+
+      <section x-show="isLoading" x-cloak class="grid grid-cols-1 lg:grid-cols-10 gap-6 items-start animate-pulse">
+        <div class="lg:col-span-7 bg-white border border-line rounded-xl p-8">
+          <div class="h-7 bg-line/60 rounded w-1/3 mb-6"></div>
+          <div class="grid grid-cols-2 gap-5"><div class="h-48 bg-line/30 rounded-lg"></div><div class="h-48 bg-line/30 rounded-lg"></div></div>
+        </div>
+        <div class="lg:col-span-3 grid gap-4">
+          <div class="h-20 bg-white border border-line rounded-xl"></div>
+          <div class="h-20 bg-white border border-line rounded-xl"></div>
+        </div>
+      </section>
+
+      <section x-show="hasSearched && !isLoading && !found" x-cloak class="text-center py-20">
+        <h2 class="text-xl font-bold text-deep mb-2">Not found</h2>
+        <p class="text-muted">
+          "<span class="font-semibold text-ink" x-text="query"></span>" is not in our database.
+        </p>
+      </section>
+
+      <template x-if="found && !isLoading">
+        <section class="grid grid-cols-1 lg:grid-cols-10 gap-6 items-start py-4">
+
+          <!-- ===== MAIN (70%) ===== -->
+          <article class="lg:col-span-7 bg-white border border-line rounded-xl shadow-sm overflow-hidden">
+            <header class="p-7 border-b border-line bg-page/60">
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-deep" x-text="ing.display_name"></h1>
+              <p x-show="ing.molecular_formula" class="mt-1.5 font-mono text-sm text-muted" x-text="ing.molecular_formula"></p>
+
+              <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-line">
+                  <span class="text-muted">CID</span><span class="font-mono text-link" x-text="ing.pubchem_cid"></span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-line">
+                  <span class="text-muted">ChEMBL</span><span class="font-mono text-teal" x-text="ing.chembl_id"></span>
+                </span>
+                <span x-show="ing.mesh_classification" class="inline-flex items-center px-3 py-1 rounded-full bg-teal/10 border border-teal/30 text-teal font-medium"
+                      x-text="ing.mesh_classification ? ing.mesh_classification.split('.')[0] : ''"></span>
+              </div>
+            </header>
+
+            <div class="p-7 space-y-5">
+
+              <!-- Chemical Structure -->
+              <div class="grid grid-cols-1 sm:grid-cols-5 gap-5 bg-page/60 border border-line rounded-lg p-6">
+                <div class="sm:col-span-3 flex flex-col justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-muted mb-2">Chemical Structure</p>
+                    <dl class="space-y-1.5 text-sm">
+                      <div class="flex justify-between border-b border-line pb-1.5">
+                        <dt class="text-muted">PubChem CID</dt>
+                        <dd><a :href="'https://pubchem.ncbi.nlm.nih.gov/compound/' + ing.pubchem_cid" target="_blank" class="font-mono text-link hover:underline" x-text="ing.pubchem_cid"></a></dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-muted">ChEMBL ID</dt>
+                        <dd><a :href="'https://www.ebi.ac.uk/chembl/compound_report_card/' + ing.chembl_id" target="_blank" class="font-mono text-teal hover:underline" x-text="ing.chembl_id"></a></dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <a :href="'https://pubchem.ncbi.nlm.nih.gov/compound/' + ing.pubchem_cid" target="_blank"
+                     class="self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-deep text-white hover:bg-link transition-colors">
+                    View on PubChem
+                  </a>
+                </div>
+                <div class="sm:col-span-2">
+                  <div class="bg-white border border-line rounded-lg p-3 h-44 flex items-center justify-center overflow-hidden">
+                    <img :src="'https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=' + ing.pubchem_cid + '&t=l'"
+                         :alt="ing.display_name + ' structure'" class="max-h-full w-auto object-contain" loading="lazy" />
+                  </div>
+                  <p class="mt-1.5 text-[11px] text-muted text-center">Source: PubChem</p>
+                </div>
+              </div>
+
+              <!-- Indication -->
+              <div x-show="ing.drug_indication" class="bg-page/60 border border-line rounded-lg p-6">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-muted mb-2">Indication</h3>
+                <p class="text-sm text-ink leading-relaxed" x-text="ing.drug_indication"></p>
+              </div>
+
+              <!-- Pharmacodynamics + half-life -->
+              <div x-show="ing.pharmacodynamics || ing.half_life" class="bg-page/60 border border-line rounded-lg p-6">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-muted mb-2">Pharmacodynamics</h3>
+                <p x-show="ing.pharmacodynamics" class="text-sm text-ink leading-relaxed" x-text="ing.pharmacodynamics"></p>
+                <div x-show="ing.half_life" class="mt-3 pt-3 border-t border-line text-sm">
+                  <span class="text-muted font-semibold">Half-life: </span><span x-text="ing.half_life"></span>
+                </div>
+              </div>
+
+              <!-- Mechanism of action / target (ChEMBL) -->
+              <div x-show="ing.pharmacology || ing.chembl_mechanism_of_action || ing.chembl_molecular_mechanism || ing.chembl_target_name"
+                   class="bg-page/60 border border-line rounded-lg p-6 space-y-3">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Mechanism of Action</h3>
+                <p x-show="ing.pharmacology" class="text-sm text-ink leading-relaxed" x-text="ing.pharmacology"></p>
+                <p x-show="ing.chembl_mechanism_of_action" class="text-sm text-ink leading-relaxed" x-text="ing.chembl_mechanism_of_action"></p>
+                <p x-show="ing.chembl_molecular_mechanism" class="text-sm text-muted leading-relaxed" x-text="ing.chembl_molecular_mechanism"></p>
+                <p x-show="ing.chembl_binding_site_comment" class="text-sm text-muted leading-relaxed" x-text="ing.chembl_binding_site_comment"></p>
+                <div x-show="ing.chembl_target_name" class="flex flex-wrap gap-2 pt-1 text-xs">
+                  <span class="px-2.5 py-1 rounded-full bg-white border border-line" x-text="ing.chembl_target_name"></span>
+                  <span x-show="ing.chembl_target_type" class="px-2.5 py-1 rounded-full bg-white border border-line text-muted" x-text="ing.chembl_target_type"></span>
+                  <span x-show="ing.chembl_target_id" class="px-2.5 py-1 rounded-full bg-white border border-line font-mono text-muted" x-text="ing.chembl_target_id"></span>
+                </div>
+              </div>
+
+              <!-- LiverTox -->
+              <div x-show="ing.livertox_summary" class="bg-page/60 border border-line rounded-lg p-6">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-muted mb-2">LiverTox Summary</h3>
+                <p class="text-sm text-ink leading-relaxed" x-text="ing.livertox_summary"></p>
+              </div>
+
+              <!-- Hazards / toxicology -->
+              <div x-show="ing.hazards_summary || ing.toxicological_info" class="bg-[#A23B3B]/5 border border-[#A23B3B]/25 rounded-lg p-6">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-[#A23B3B] mb-2">Hazards &amp; Toxicology</h3>
+                <p x-show="ing.hazards_summary" class="text-sm text-ink leading-relaxed" x-text="ing.hazards_summary"></p>
+                <p x-show="ing.toxicological_info" class="mt-2 text-sm text-ink leading-relaxed" x-text="ing.toxicological_info"></p>
+              </div>
+
+            </div>
+          </article>
+
+          <!-- ===== SIDEBAR (30%) ===== -->
+          <aside class="lg:col-span-3 lg:sticky lg:top-20">
+            <div class="bg-white border border-line rounded-xl shadow-sm p-6">
+              <h2 class="text-xs font-semibold uppercase tracking-wide text-muted mb-4">
+                Used in Trade Names <span class="text-muted/70" x-text="'(' + ing.used_in.length + ')'"></span>
+              </h2>
+              <p x-show="ing.used_in.length === 0" class="text-sm text-muted">No registered products found.</p>
+              <div x-show="ing.used_in.length > 0" class="grid gap-3 max-h-[420px] overflow-y-auto pr-1 thin-scroll">
+                <template x-for="trade in ing.used_in" :key="trade.trade_name">
+                  <a :href="'trade_name.html?q=' + encodeURIComponent(trade.trade_name)"
+                     class="bg-page/60 border border-line rounded-lg p-3.5 hover:border-link transition-colors block">
+                    <span class="font-bold text-ink text-sm" x-text="trade.trade_name"></span>
+                    <p class="mt-0.5 text-xs text-muted" x-text="trade.manufacturer"></p>
+                  </a>
+                </template>
+              </div>
+            </div>
+          </aside>
+
+          <!-- ===== RECEPTOR STRUCTURES — full width evidence band =====
+               Per the brand guide this is "a major differentiator" and needs to feel
+               like an evidence layer, not one more card in the stack. Ligand data has
+               been pulled out into its own section below — a receptor here only reports
+               on itself (pdb_id, resolution, method, download), matching the API schema. -->
+          <div x-show="ing.pdb_structures && ing.pdb_structures.length > 0" class="lg:col-span-10">
+            <div class="bg-teal/5 border-2 border-teal/25 rounded-2xl p-7 sm:p-8">
+              <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-teal mb-1">Structural Evidence</p>
+                  <h2 class="text-xl sm:text-2xl font-extrabold text-deep">Receptor structures for this ingredient</h2>
+                </div>
+                <span class="text-sm text-muted font-mono" x-text="ing.pdb_structures.length + ' structure(s)'"></span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
+                  <div class="bg-white border border-line rounded-xl p-5 shadow-sm flex flex-col">
+                    <div class="bg-page border border-line rounded-lg h-36 flex items-center justify-center overflow-hidden p-2">
+                      <img :src="'https://cdn.rcsb.org/images/structures/' + pdb.pdb_id.toLowerCase() + '_assembly-1.jpeg'"
+                           :alt="pdb.pdb_id + ' receptor'" class="max-h-full w-auto object-contain" loading="lazy"
+                           @error="$event.target.style.display='none'" />
+                    </div>
+
+                    <h4 class="mt-4 text-lg font-bold text-ink font-mono" x-text="pdb.pdb_id"></h4>
+                    <p class="text-[11px] text-muted mt-0.5">Source: RCSB PDB</p>
+
+                    <dl class="mt-3 space-y-1.5 text-xs flex-1">
+                      <div x-show="pdb.experiment_method" class="flex justify-between border-b border-line pb-1.5">
+                        <dt class="text-muted">Method</dt>
+                        <dd class="font-semibold text-ink text-right" x-text="pdb.experiment_method"></dd>
+                      </div>
+                      <div x-show="pdb.resolution" class="flex justify-between border-b border-line pb-1.5">
+                        <dt class="text-muted">Resolution</dt>
+                        <dd class="font-semibold text-teal" x-text="pdb.resolution + ' Å'"></dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-muted">Ligands extracted</dt>
+                        <dd>
+                          <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
+                             class="font-semibold text-link hover:underline" x-text="pdb.ligands.length + ' — view below'"></a>
+                          <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold text-ink">0</span>
+                        </dd>
+                      </div>
+                    </dl>
+
+                    <a :href="pdb.download_url" target="_blank"
+                       class="mt-4 w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold
+                              bg-deep text-white hover:bg-link transition-colors">
+                      Download receptor (.pdb)
+                    </a>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== LIGAND FILES — its own section, not a side detail =====
+               Up to ~10 ligand files can belong to one ingredient across its receptors,
+               each with real per-file data (resolution, RSR, RSCC, atom count). That
+               deserves its own band, visually distinct from the receptor band above,
+               with every field shown outright instead of buried in a hover tooltip. -->
+          <div x-show="allLigands.length > 0" id="ligand-files" class="lg:col-span-10">
+            <div class="bg-deep/[0.04] border-2 border-deep/15 rounded-2xl p-7 sm:p-8">
+              <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-deep mb-1">Structural Evidence</p>
+                  <h2 class="text-xl sm:text-2xl font-extrabold text-deep">Ligand files extracted from these structures</h2>
+                </div>
+                <span class="text-sm text-muted font-mono" x-text="allLigands.length + ' ligand file(s)'"></span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <template x-for="lig in allLigands" :key="lig.pdb_id + '_' + lig.ligand_file_name">
+                  <div class="bg-white border border-line rounded-xl p-4 shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between gap-2 mb-2.5">
+                      <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-page border border-line text-muted" x-text="lig.pdb_id"></span>
+                      <span x-show="lig.resolution" class="text-[11px] font-semibold text-teal" x-text="lig.resolution + ' Å'"></span>
+                    </div>
+                    <h4 class="text-sm font-bold text-ink leading-snug flex-1" x-text="cleanLigandName(lig.ligand_file_name)"></h4>
+
+                    <dl class="mt-3 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
+                      <div class="flex justify-between border-b border-line pb-1">
+                        <dt class="text-muted">RSR</dt>
+                        <dd class="font-mono text-ink" x-text="(lig.rsr ?? '—')"></dd>
+                      </div>
+                      <div class="flex justify-between border-b border-line pb-1">
+                        <dt class="text-muted">RSCC</dt>
+                        <dd class="font-mono text-ink" x-text="(lig.rscc ?? '—')"></dd>
+                      </div>
+                      <div class="flex justify-between col-span-2">
+                        <dt class="text-muted">Atoms</dt>
+                        <dd class="font-mono text-ink" x-text="(lig.atom_count ?? '—')"></dd>
+                      </div>
+                    </dl>
+
+                    <a :href="lig.download_url" target="_blank"
+                       class="mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold
+                              bg-deep text-white hover:bg-link transition-colors">
+                      Download ligand
+                    </a>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </template>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-line py-8 text-center text-sm text-muted">© 2026 DrugNexus.</footer>
+
+  <!-- ===================== LOGIC — wired to the real backend ===================== -->
+  <script>
+    const API_BASE = ''; // same-origin: frontend and API are served from the same FastAPI app
+
+    function ingredientSearch() {
+      return {
+        query: '',
+        isLoading: false,
+        hasSearched: false,
+        ing: null,
+
+        get found() { return this.ing !== null; },
+
+        // Flattens every receptor's ligands into one list for the dedicated Ligand
+        // Files section, tagging each with its parent pdb_id since a ligand file only
+        // has meaning in the context of the structure it came from.
+        get allLigands() {
+          if (!this.ing || !this.ing.pdb_structures) return [];
+          return this.ing.pdb_structures.flatMap(pdb =>
+            (pdb.ligands || []).map(lig => ({ ...lig, pdb_id: pdb.pdb_id }))
+          );
+        },
+
+        cleanLigandName(fileName) {
+          return fileName.replace(/\.pdbqt$/, '').split('_').slice(1).join(' ');
+        },
+
+        initFromUrl() {
+          const q = new URLSearchParams(window.location.search).get('q');
+          if (q) { this.query = q; this.search(); }
+        },
+
+        async search() {
+          const q = this.query.trim();
+          if (!q) return;
+
+          this.isLoading = true;
+          this.hasSearched = true;
+          this.ing = null;
+
+          try {
+            const res = await fetch(`${API_BASE}/active_ingredient/${encodeURIComponent(q)}`);
+            if (res.status === 404) {
+              this.ing = null;
+            } else if (!res.ok) {
+              throw new Error(`API returned ${res.status}`);
+            } else {
+              this.ing = await res.json();
+            }
+          } catch (err) {
+            console.error('Active ingredient search failed:', err);
+            this.ing = null;
+          }
+
+          this.isLoading = false;
+        },
+      };
+    }
+  </script>
+</body>
+</html>
