@@ -15,7 +15,7 @@ Vercel بيقفل الطلب بعد 10 ثواني (خطة مجانية) فيظه
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
 from .models import Drug, DrugIngredient, Ingredient
@@ -26,8 +26,8 @@ router = APIRouter(prefix="/trade_name", tags=["trade_name"])
 MAX_RESULTS = 20
 
 
-def _find_exact_alternatives(
-    db: Session, drug_id: int, ingredient_cids: set[str]
+async def _find_exact_alternatives(
+    db: AsyncSession, drug_id: int, ingredient_cids: set[str]
 ) -> list[AlternativeDrug]:
     """يلاقي أدوية تانية عندها بالظبط نفس مجموعة المواد الفعالة -
     استعلام واحد بدل استعلام لكل مرشح."""
@@ -60,19 +60,21 @@ def _find_exact_alternatives(
         .subquery()
     )
 
-    exact_match_ids = db.execute(
+    result = await db.execute(
         select(matching.c.drug_id)
         .join(totals, totals.c.drug_id == matching.c.drug_id)
         .where(matching.c.matching_count == target_count)
         .where(totals.c.total_count == target_count)
-    ).scalars().all()
+    )
+    exact_match_ids = result.scalars().all()
 
     if not exact_match_ids:
         return []
 
-    alt_drugs = db.execute(
+    result = await db.execute(
         select(Drug).where(Drug.id.in_(exact_match_ids))
-    ).scalars().all()
+    )
+    alt_drugs = result.scalars().all()
 
     return [
         AlternativeDrug(trade_name=d.trade_name, manufacturer=d.manufacturer)
@@ -81,23 +83,25 @@ def _find_exact_alternatives(
 
 
 @router.get("/{trade_name}", response_model=list[TradeNameResponse])
-def search_by_trade_name(trade_name: str, db: Session = Depends(get_db)):
-    drugs = db.execute(
+async def search_by_trade_name(trade_name: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
         select(Drug)
         .where(Drug.trade_name.ilike(f"%{trade_name}%"))
         .limit(MAX_RESULTS)
-    ).scalars().all()
+    )
+    drugs = result.scalars().all()
 
     results = []
     for drug in drugs:
-        ingredients = db.execute(
+        result = await db.execute(
             select(Ingredient)
             .join(DrugIngredient, DrugIngredient.pubchem_cid == Ingredient.pubchem_cid)
             .where(DrugIngredient.drug_id == drug.id)
-        ).scalars().all()
+        )
+        ingredients = result.scalars().all()
 
         ingredient_cids = {i.pubchem_cid for i in ingredients}
-        alternatives = _find_exact_alternatives(db, drug.id, ingredient_cids)
+        alternatives = await _find_exact_alternatives(db, drug.id, ingredient_cids)
 
         results.append(TradeNameResponse(
             trade_name=drug.trade_name,

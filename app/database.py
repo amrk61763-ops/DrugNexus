@@ -15,24 +15,50 @@
 
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
 
 load_dotenv()
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Convert to async URL if using psycopg2
+if DATABASE_URL.startswith("postgresql://"):
+    ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+else:
+    ASYNC_DATABASE_URL = DATABASE_URL
+
+# Connection pool settings for optimal performance
+engine = create_async_engine(
+    ASYNC_DATABASE_URL,
+    pool_size=20,              # Number of connections to keep open
+    max_overflow=40,           # Max additional connections beyond pool_size
+    pool_pre_ping=True,        # Verify connections before use (handles Neon's cold starts)
+    pool_recycle=3600,         # Recycle connections after 1 hour
+    echo=False,                # Set to True for SQL debugging
+)
+
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
+)
 
 # Base بس عشان الموديلز تعرف توصف الجداول الموجودة - مش بنستخدمها لعمل
 # create_all() في أي مكان، لأن الجداول موجودة بالفعل جوه Neon
 Base = declarative_base()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    """Async dependency for getting database session"""
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()

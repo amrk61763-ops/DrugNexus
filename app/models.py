@@ -8,7 +8,7 @@
 مباشرة (python3 models.py) وهيطبعلك أسماء الأعمدة اللي قرأها.
 """
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Column, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
