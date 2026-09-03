@@ -81,14 +81,12 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         ReceptorStructure(
             pdb_id=r.pdb_id,
             receptor_file_name=r.receptor_file_name,
-            # coerce DB value to str if present to satisfy Pydantic's str | None
             resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
             experiment_method=getattr(r, "experiment_method", None),
             download_url=getattr(r, "receptor_blob_url", None),
             ligands=[
                 LigandFile(
                     ligand_file_name=l.ligand_file_name,
-                    # coerce Decimal/number to string if not None
                     resolution=str(getattr(l, "resolution")) if getattr(l, "resolution", None) is not None else None,
                     rsr=_to_int(getattr(l, "rsr", None)),
                     rscc=_to_int(getattr(l, "rscc", None)),
