@@ -61,6 +61,8 @@ class IngredientDetail(Base):
     chembl_target_name: Mapped[str | None] = mapped_column()
     chembl_target_type: Mapped[str | None] = mapped_column()
 
+# ... (top of file unchanged) ...
+
 class PdbReceptor(Base):
     __tablename__ = "pdb_receptors"
 
@@ -68,7 +70,7 @@ class PdbReceptor(Base):
     pubchem_cid: Mapped[str] = mapped_column()  # Remove ForeignKey for now
     receptor_file_name: Mapped[str] = mapped_column()
     # resolution is usually a text like "2.0 Å" -> use str | None
-    resolution: Mapped[int | None] = mapped_column()
+    resolution: Mapped[str | None] = mapped_column()
     # experiment_method is textual (e.g. "X-RAY DIFFRACTION")
     experiment_method: Mapped[str | None] = mapped_column()
     receptor_blob_pathname: Mapped[str] = mapped_column()
@@ -81,13 +83,12 @@ class PdbLigand(Base):
     pdb_id: Mapped[str] = mapped_column(ForeignKey("pdb_receptors.pdb_id"), primary_key=True)
     ligand_file_name: Mapped[str] = mapped_column(primary_key=True)
     # ligand resolution may be textual (keep str | None)
-    resolution: Mapped[int | None] = mapped_column()
+    resolution: Mapped[str | None] = mapped_column()
     rsr: Mapped[int | None] = mapped_column()
     rscc: Mapped[int | None] = mapped_column()
     atom_count: Mapped[int | None] = mapped_column()
     ligand_blob_pathname: Mapped[str] = mapped_column()
     ligand_blob_url: Mapped[str | None] = mapped_column()
-
 
 if __name__ == "__main__":
     # تشغيل الملف مباشرة (مش عن طريق FastAPI) بيوريك إن الوصف اتقرا صح
