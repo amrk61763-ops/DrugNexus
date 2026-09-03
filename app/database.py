@@ -36,6 +36,7 @@ engine = create_async_engine(
     pool_pre_ping=True,        # Verify connections before use (handles Neon's cold starts)
     pool_recycle=3600,         # Recycle connections after 1 hour
     echo=False,                # Set to True for SQL debugging
+    connect_args={"server_settings": {"channel_binding": "disable"}},
 )
 
 AsyncSessionLocal = async_sessionmaker(
