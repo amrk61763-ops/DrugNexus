@@ -63,10 +63,18 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
     all_drugs = result.scalars().all()
 
     # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
-    result = await db.execute(
-        select(PdbReceptor).where(PdbReceptor.pubchem_cid == pubchem_cid)
-    )
-    receptors = result.scalars().all()
+    # pubchem_cid في pdb_receptors عمود jsonb - أحيانًا رقم مفرد وأحيانًا
+    # array من أرقام (لو الـreceptor مرتبط بأكتر من ligand)، فمينفعش نقارنه
+    # بـ== عادي (ده اللي كان بيرمي jsonb = character varying). بنستخدم
+    # containment operator (@>) عن طريق .contains() بدل كده، وده بيشتغل
+    # صح في الحالتين (رقم مفرد أو array) من غير أي type mismatch.
+    cid_int = _to_int(pubchem_cid)
+    receptors = []
+    if cid_int is not None:
+        result = await db.execute(
+            select(PdbReceptor).where(PdbReceptor.pubchem_cid.contains(cid_int))
+        )
+        receptors = result.scalars().all()
 
     pdb_structures: list[ReceptorStructure] = []
 
@@ -115,9 +123,8 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         trade_name = drug.trade_name
         if not trade_name:
             continue
-            
+
         # Split by space to get the first word (the base name/prefix)
-        # e.g., "Augmentin 1g" -> ["Augmentin", "1g"] -> "Augmentin"
         base_name = trade_name.split()[0]
 
         # Only add if we haven't seen this base name yet
