@@ -67,23 +67,24 @@ class PdbReceptor(Base):
     pdb_id: Mapped[str] = mapped_column(primary_key=True)
     pubchem_cid: Mapped[str] = mapped_column()  # Remove ForeignKey for now
     receptor_file_name: Mapped[str] = mapped_column()
-    resolution: Mapped[int] = mapped_column()
-    experiment_method: Mapped[int] = mapped_column()
+    # resolution is usually a text like "2.0 Å" -> use str | None
+    resolution: Mapped[str | None] = mapped_column()
+    # experiment_method is textual (e.g. "X-RAY DIFFRACTION")
+    experiment_method: Mapped[str | None] = mapped_column()
     receptor_blob_pathname: Mapped[str] = mapped_column()
     receptor_blob_url: Mapped[str | None] = mapped_column()
 
 
 class PdbLigand(Base):
-    """مفيش id مستقل - زي DrugIngredient، بنستخدم (pdb_id + ligand_file_name)
-    مع بعض كـprimary key وصفي بس (composite key)."""
     __tablename__ = "pdb_ligands"
 
     pdb_id: Mapped[str] = mapped_column(ForeignKey("pdb_receptors.pdb_id"), primary_key=True)
     ligand_file_name: Mapped[str] = mapped_column(primary_key=True)
-    resolution: Mapped[int] = mapped_column()
-    rsr: Mapped[int] = mapped_column()
-    rscc: Mapped[int] = mapped_column()
-    atom_count: Mapped[int] = mapped_column()
+    # ligand resolution may be textual (keep str | None)
+    resolution: Mapped[str | None] = mapped_column()
+    rsr: Mapped[int | None] = mapped_column()
+    rscc: Mapped[int | None] = mapped_column()
+    atom_count: Mapped[int | None] = mapped_column()
     ligand_blob_pathname: Mapped[str] = mapped_column()
     ligand_blob_url: Mapped[str | None] = mapped_column()
 
