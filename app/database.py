@@ -31,28 +31,27 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 # ------------------------------------------------------------------
 # Neon connection URL -> SQLAlchemy asyncpg URL
 # ------------------------------------------------------------------
-# Neon connection strings may contain `channel_binding=require`.
-# That option is not a valid keyword for the asyncpg.connect() version
-# used by this deployment, so SQLAlchemy would otherwise pass it through
-# and the API would fail with:
-#   TypeError: connect() got an unexpected keyword argument 'channel_binding'
+# Neon/libpq connection strings can contain parameters such as
+# `sslmode=require` and `channel_binding=require`. Those are libpq-style
+# connection options and must not be passed through to asyncpg.connect()
+# as keyword arguments.
 #
-# Remove ONLY that URL query parameter. Keep all other connection
-# parameters unchanged.
+# SQLAlchemy's asyncpg dialect is used below, so remove only those
+# unsupported URL parameters and preserve the rest of the connection URL.
 url = make_url(DATABASE_URL)
 
 if url.drivername == "postgresql":
     url = url.set(drivername="postgresql+asyncpg")
 
-url = url.difference_update_query(["channel_binding"])
+url = url.difference_update_query(
+    ["channel_binding", "sslmode"]
+)
+
 ASYNC_DATABASE_URL = url.render_as_string(hide_password=False)
 
 # ------------------------------------------------------------------
 # Async engine
 # ------------------------------------------------------------------
-# Keep the existing pool settings to minimize unrelated behavior
-# changes. The important fix is that channel_binding is no longer sent
-# as an unsupported asyncpg.connect() keyword.
 engine = create_async_engine(
     ASYNC_DATABASE_URL,
     pool_size=20,
