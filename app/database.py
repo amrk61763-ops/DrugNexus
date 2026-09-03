@@ -18,6 +18,9 @@ from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
+# Optional runtime introspection
+import inspect
+
 load_dotenv()
 
 DATABASE_URL = os.environ["DATABASE_URL"]
@@ -28,19 +31,36 @@ if DATABASE_URL.startswith("postgresql://"):
 else:
     ASYNC_DATABASE_URL = DATABASE_URL
 
+# Build connect_args conditionally so we don't pass unsupported kwargs to asyncpg.connect
+connect_args = {}
+try:
+    # Import asyncpg only if available in the runtime. If it's not present,
+    # we keep connect_args empty to avoid import-time failures in environments
+    # that don't have asyncpg installed (some test or build environments).
+    import asyncpg
+
+    sig = inspect.signature(asyncpg.connect)
+    # asyncpg.connect accepts server_settings in some versions; only add it when supported
+    if "server_settings" in sig.parameters:
+        connect_args = {"server_settings": {"channel_binding": "disable"}}
+except Exception:
+    # If anything goes wrong (module missing or signature unexpected), don't pass connect args
+    connect_args = {}
+
 # Connection pool settings for optimal performance
-# NOTE: removed `channel_binding` server setting because some asyncpg/DB-API
-# versions raise: "TypeError: connect() got an unexpected keyword argument 'channel_binding'".
-# If you specifically need to adjust server settings for your PostgreSQL host,
-# set them via the DATABASE_URL or with supported keys in connect_args.
-engine = create_async_engine(
-    ASYNC_DATABASE_URL,
+engine_kwargs = dict(
     pool_size=20,              # Number of connections to keep open
     max_overflow=40,           # Max additional connections beyond pool_size
     pool_pre_ping=True,        # Verify connections before use (handles Neon's cold starts)
     pool_recycle=3600,         # Recycle connections after 1 hour
     echo=False,                # Set to True for SQL debugging
 )
+
+# Only include connect_args if non-empty
+if connect_args:
+    engine = create_async_engine(ASYNC_DATABASE_URL, **engine_kwargs, connect_args=connect_args)
+else:
+    engine = create_async_engine(ASYNC_DATABASE_URL, **engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
