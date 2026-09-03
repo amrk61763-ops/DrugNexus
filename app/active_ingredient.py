@@ -7,7 +7,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
 from .models import Drug, DrugIngredient, Ingredient, IngredientDetail, PdbLigand, PdbReceptor
@@ -33,11 +33,12 @@ def _to_int(val):
 
 
 @router.get("/{display_name}", response_model=ActiveIngredientResponse)
-def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
+async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_db)):
     # 1. Search for the ingredient by display_name (partial, case-insensitive)
-    ingredient = db.execute(
+    result = await db.execute(
         select(Ingredient).where(Ingredient.display_name.ilike(f"%{display_name}%"))
-    ).scalars().first()
+    )
+    ingredient = result.scalars().first()
 
     if ingredient is None:
         raise HTTPException(status_code=404, detail="المادة الفعالة دي مش موجودة")
@@ -46,21 +47,24 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
     pubchem_cid = ingredient.pubchem_cid
 
     # 3. Use the pubchem_cid to get details
-    details = db.execute(
+    result = await db.execute(
         select(IngredientDetail).where(IngredientDetail.pubchem_cid == pubchem_cid)
-    ).scalar_one_or_none()
+    )
+    details = result.scalar_one_or_none()
 
     # 4. Fetch ALL drugs containing this ingredient
-    all_drugs = db.execute(
+    result = await db.execute(
         select(Drug)
         .join(DrugIngredient, DrugIngredient.drug_id == Drug.id)
         .where(DrugIngredient.pubchem_cid == pubchem_cid)
-    ).scalars().all()
+    )
+    all_drugs = result.scalars().all()
 
     # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
-    receptors = db.execute(
+    result = await db.execute(
         select(PdbReceptor).where(PdbReceptor.pubchem_cid == pubchem_cid)
-    ).scalars().all()
+    )
+    receptors = result.scalars().all()
 
     pdb_structures: list[ReceptorStructure] = []
 
@@ -69,9 +73,10 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
 
         # استعلام واحد لكل الـligands بتوع كل الـreceptors مع بعض
         # (بدل استعلام منفصل لكل receptor - نفس فلسفة trade_name.py)
-        all_ligands = db.execute(
+        result = await db.execute(
             select(PdbLigand).where(PdbLigand.pdb_id.in_(receptor_pdb_ids))
-        ).scalars().all()
+        )
+        all_ligands = result.scalars().all()
 
         ligands_by_pdb_id: dict[str, list[PdbLigand]] = {}
         for lig in all_ligands:

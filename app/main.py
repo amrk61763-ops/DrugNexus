@@ -9,10 +9,27 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
+from .database import engine
 from . import active_ingredient, trade_name
 
-app = FastAPI(title="DrugNexus API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Async lifespan manager for startup/shutdown events"""
+    # Startup: dispose of any connections if needed
+    yield
+    # Shutdown: dispose of the database engine
+    await engine.dispose()
+
+
+app = FastAPI(
+    title="DrugNexus API",
+    description="Professional async API for drug information lookup",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 # CORS: بيسمح للفرونت اند (على دومين مختلف زي Cloudflare Pages مثلاً)
 # إنه يكلم الـAPI ده. من غيره، المتصفح بيرفض الرد حتى لو السيرفر
@@ -34,5 +51,5 @@ app.include_router(active_ingredient.router)
 
 
 @app.get("/")
-def root():
+async def root():
     return {"status": "شغال", "docs": "/docs"}
