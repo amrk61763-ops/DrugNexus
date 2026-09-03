@@ -67,6 +67,8 @@ class PdbReceptor(Base):
     pdb_id: Mapped[str] = mapped_column(primary_key=True)
     pubchem_cid: Mapped[str] = mapped_column()  # Remove ForeignKey for now
     receptor_file_name: Mapped[str] = mapped_column()
+    resolution: Mapped[int] = mapped_column()
+    experiment_method: Mapped[int] = mapped_column()
     receptor_blob_pathname: Mapped[str] = mapped_column()
     receptor_blob_url: Mapped[str | None] = mapped_column()
 
@@ -78,6 +80,10 @@ class PdbLigand(Base):
 
     pdb_id: Mapped[str] = mapped_column(ForeignKey("pdb_receptors.pdb_id"), primary_key=True)
     ligand_file_name: Mapped[str] = mapped_column(primary_key=True)
+    resolution: Mapped[int] = mapped_column()
+    rsr: Mapped[int] = mapped_column()
+    rscc: Mapped[int] = mapped_column()
+    atom_count: Mapped[int] = mapped_column()
     ligand_blob_pathname: Mapped[str] = mapped_column()
     ligand_blob_url: Mapped[str | None] = mapped_column()
 
