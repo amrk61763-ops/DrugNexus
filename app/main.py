@@ -1,10 +1,10 @@
- from fastapi import FastAPI
- from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
- from . import active_ingredient, trade_name
+from . import active_ingredient, trade_name
 
 
- app = FastAPI(
+app = FastAPI(
     title="DrugNexus API",
     description="API for searching drug information",
     version="1.0.0",
