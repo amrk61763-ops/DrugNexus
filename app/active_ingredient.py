@@ -6,7 +6,7 @@
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
@@ -64,15 +64,17 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
 
     # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
     # pubchem_cid في pdb_receptors عمود jsonb - أحيانًا رقم مفرد وأحيانًا
-    # array من أرقام (لو الـreceptor مرتبط بأكتر من ligand)، فمينفعش نقارنه
-    # بـ== عادي (ده اللي كان بيرمي jsonb = character varying). بنستخدم
-    # containment operator (@>) عن طريق .contains() بدل كده، وده بيشتغل
-    # صح في الحالتين (رقم مفرد أو array) من غير أي type mismatch.
+    # array من أرقام. .contains() العادي بيبعت الرقم كـINTEGER من غير ما
+    # يحوّله لـjsonb (وده كان بيرمي jsonb @> integer)، فبنستخدم دالة
+    # to_jsonb() الصريحة من بوستجرس عشان نضمن الكاست الصح، وده نفس
+    # الكويري اللي جربناها على الداتابيز الحقيقية واشتغلت.
     cid_int = _to_int(pubchem_cid)
     receptors = []
     if cid_int is not None:
         result = await db.execute(
-            select(PdbReceptor).where(PdbReceptor.pubchem_cid.contains(cid_int))
+            select(PdbReceptor).where(
+                PdbReceptor.pubchem_cid.op("@>", is_comparison=True)(func.to_jsonb(cid_int))
+            )
         )
         receptors = result.scalars().all()
 
