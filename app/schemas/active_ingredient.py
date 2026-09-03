@@ -10,7 +10,8 @@ from pydantic import BaseModel
 
 class TradeNameUsingIngredient(BaseModel):
     trade_name: str
-    manufacturer: str
+    manufacturer: str | None
+
 
 class LigandFile(BaseModel):
     ligand_file_name: str
@@ -32,7 +33,7 @@ class ReceptorStructure(BaseModel):
 
 class ActiveIngredientResponse(BaseModel):
     pubchem_cid: str
-    chembl_id: str
+    chembl_id: str | None
     display_name: str
 
     molecular_formula: str | None
@@ -51,7 +52,6 @@ class ActiveIngredientResponse(BaseModel):
     chembl_target_id: str | None
     chembl_target_name: str | None
     chembl_target_type: str | None
-    
 
     used_in: list[TradeNameUsingIngredient]
     pdb_structures: list[ReceptorStructure]
