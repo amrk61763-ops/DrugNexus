@@ -77,27 +77,29 @@ def get_by_display_name(display_name: str, db: Session = Depends(get_db)):
         for lig in all_ligands:
             ligands_by_pdb_id.setdefault(lig.pdb_id, []).append(lig)
 
-        pdb_structures = [
-            ReceptorStructure(
-                pdb_id=r.pdb_id,
-                receptor_file_name=r.receptor_file_name,
-                resolution=getattr(r, "resolution", None),
-                experiment_method=getattr(r, "experiment_method", None),
-                download_url=getattr(r, "receptor_blob_url", None),
-                ligands=[
-                    LigandFile(
-                        ligand_file_name=l.ligand_file_name,
-                        resolution=getattr(l, "resolution", None),
-                        rsr=_to_int(getattr(l, "rsr", None)),
-                        rscc=_to_int(getattr(l, "rscc", None)),
-                        atom_count=_to_int(getattr(l, "atom_count", None)),
-                        download_url=getattr(l, "ligand_blob_url", None),
-                    )
-                    for l in ligands_by_pdb_id.get(r.pdb_id, [])
-                ],
-            )
-            for r in receptors
-        ]
+    pdb_structures = [
+        ReceptorStructure(
+            pdb_id=r.pdb_id,
+            receptor_file_name=r.receptor_file_name,
+            # coerce DB value to str if present to satisfy Pydantic's str | None
+            resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
+            experiment_method=getattr(r, "experiment_method", None),
+            download_url=getattr(r, "receptor_blob_url", None),
+            ligands=[
+                LigandFile(
+                    ligand_file_name=l.ligand_file_name,
+                    # coerce Decimal/number to string if not None
+                    resolution=str(getattr(l, "resolution")) if getattr(l, "resolution", None) is not None else None,
+                    rsr=_to_int(getattr(l, "rsr", None)),
+                    rscc=_to_int(getattr(l, "rscc", None)),
+                    atom_count=_to_int(getattr(l, "atom_count", None)),
+                    download_url=getattr(l, "ligand_blob_url", None),
+                )
+                for l in ligands_by_pdb_id.get(r.pdb_id, [])
+            ],
+        )
+        for r in receptors
+    ]
 
     # 5. Process drugs to extract the base name (prefix) and remove duplicates
     # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
