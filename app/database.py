@@ -22,13 +22,17 @@ load_dotenv()
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
-# Convert to async URL if using psycopg2
+# Convert to async URL if using asyncpg
 if DATABASE_URL.startswith("postgresql://"):
     ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 else:
     ASYNC_DATABASE_URL = DATABASE_URL
 
 # Connection pool settings for optimal performance
+# NOTE: removed `channel_binding` server setting because some asyncpg/DB-API
+# versions raise: "TypeError: connect() got an unexpected keyword argument 'channel_binding'".
+# If you specifically need to adjust server settings for your PostgreSQL host,
+# set them via the DATABASE_URL or with supported keys in connect_args.
 engine = create_async_engine(
     ASYNC_DATABASE_URL,
     pool_size=20,              # Number of connections to keep open
@@ -36,7 +40,6 @@ engine = create_async_engine(
     pool_pre_ping=True,        # Verify connections before use (handles Neon's cold starts)
     pool_recycle=3600,         # Recycle connections after 1 hour
     echo=False,                # Set to True for SQL debugging
-    connect_args={"server_settings": {"channel_binding": "disable"}},
 )
 
 AsyncSessionLocal = async_sessionmaker(
