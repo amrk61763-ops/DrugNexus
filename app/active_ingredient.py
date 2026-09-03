@@ -19,8 +19,10 @@ from .schemas.active_ingredient import (
 )
 
 router = APIRouter(
-    prefix="/active_ingredient", tags=["active_ingredient"]
+    prefix="/active_ingredient",
+    tags=["Active Ingredient"],
 )
+
 
 
 def _to_int(val):
