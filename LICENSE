@@ -1,0 +1,155 @@
+DRUGNEXUS SOURCE-AVAILABLE LICENSE
+
+Copyright (c) 2026 Amr Khaled Abdelkader
+
+All rights reserved.
+
+1. DEFINITIONS
+
+"Software" means the DrugNexus source code, documentation, configuration,
+and other original materials contained in this repository that are owned
+by the copyright holder.
+
+"Copyright Holder" means Amr Khaled Abdelkader.
+
+"Commercial Use" means any use of the Software, in whole or in part,
+directly or indirectly, for monetary compensation, commercial advantage,
+business operations, revenue generation, paid services, SaaS offerings,
+hosted services, resale, licensing to third parties, or use within a
+commercial product or service.
+
+2. PERMITTED USE
+
+The Copyright Holder grants you a limited, non-exclusive, non-transferable,
+revocable license to:
+
+- View the Software source code.
+- Study the Software for educational purposes.
+- Run the Software for personal, non-commercial purposes.
+- Modify the Software for personal, educational, or academic research
+  purposes.
+- Create private derivative works for the purposes described above.
+
+3. PROHIBITED USE
+
+Without prior written permission from the Copyright Holder, you may not:
+
+- Use the Software for Commercial Use.
+- Sell, sublicense, lease, rent, or otherwise commercially exploit the
+  Software or derivative works based on it.
+- Offer the Software or a substantially similar derivative as a paid
+  product, service, API, SaaS platform, hosted service, or commercial
+  application.
+- Incorporate substantial portions of the Software into a commercial
+  product or service.
+- Redistribute modified or unmodified copies of the Software outside the
+  permissions expressly granted by this License.
+- Remove or alter copyright, attribution, license, or proprietary notices.
+- Represent that you are the author or owner of the Software.
+
+4. COMMERCIAL LICENSING
+
+Commercial use is not granted by this License.
+
+The Copyright Holder reserves the exclusive right to authorize commercial
+use of the Software and may provide separate commercial licenses,
+partnership agreements, assignments, or other written permissions at
+their discretion.
+
+A separate written agreement with the Copyright Holder may grant rights
+that are not permitted by this License.
+
+5. INTELLECTUAL PROPERTY
+
+Except for rights expressly granted by this License, all copyright and
+other intellectual property rights in the Software remain with the
+Copyright Holder.
+
+Nothing in this License transfers ownership of the Software or any
+intellectual property rights to you.
+
+6. THIRD-PARTY MATERIALS
+
+This License applies only to original materials owned by the Copyright
+Holder.
+
+Third-party software, libraries, datasets, scientific databases,
+structures, identifiers, documentation, trademarks, logos, and other
+external materials included in, linked to, or used by DrugNexus are not
+licensed under this License unless explicitly stated otherwise.
+
+Such materials remain subject to their respective licenses, terms,
+copyrights, and usage policies.
+
+Users are responsible for complying with the applicable terms of
+third-party materials.
+
+7. DATA AND SCIENTIFIC RESOURCES
+
+DrugNexus may reference or process information obtained from external
+scientific resources, including but not limited to PubChem, ChEMBL, and
+the Protein Data Bank (PDB).
+
+The presence of such information in DrugNexus does not transfer ownership
+of those resources to the Copyright Holder and does not grant rights beyond
+those provided by the respective data providers.
+
+8. TRADEMARKS
+
+The name "DrugNexus", its logo, branding, and other project-specific
+marks are not licensed under this License unless expressly stated.
+
+This License does not grant permission to use the project's trademarks,
+branding, or identity in a manner that implies endorsement, affiliation,
+or authorization by the Copyright Holder.
+
+9. CONTRIBUTIONS
+
+Unless a separate written agreement states otherwise, contributions
+submitted to this repository are provided under the same terms applicable
+to the portion of the Software to which the contribution belongs, to the
+extent the contributor has the legal right to provide those rights.
+
+By submitting a contribution, you represent that you have the necessary
+rights to submit it.
+
+10. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE, OR NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES,
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+11. MEDICAL AND SCIENTIFIC DISCLAIMER
+
+DrugNexus is provided for informational, educational, and research
+purposes.
+
+Nothing in the Software or associated project materials constitutes
+medical advice, diagnosis, treatment, prescribing advice, or a substitute
+for professional clinical judgment or authoritative regulatory or
+scientific sources.
+
+Users are responsible for independently verifying information before
+using it for clinical, pharmaceutical, scientific, or other consequential
+purposes.
+
+12. TERMINATION
+
+The permissions granted by this License automatically terminate if you
+violate its terms.
+
+Upon termination, you must cease all use of the Software except to the
+extent that applicable law provides otherwise.
+
+13. RESERVATION OF RIGHTS
+
+All rights not expressly granted by this License are reserved by the
+Copyright Holder.
+
+For permissions not covered by this License, including commercial
+licensing, contact the Copyright Holder.
