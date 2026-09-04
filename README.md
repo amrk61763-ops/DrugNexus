@@ -105,7 +105,7 @@ The purpose of the pipeline is to move from available structural records toward 
 
 Conceptually:
 
-``text
+```text
 Active Ingredient
        ↓
 Structural Search
