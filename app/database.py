@@ -1,4 +1,5 @@
 import os
+import ssl
 from dotenv import load_dotenv
 from sqlalchemy import make_url
 from sqlalchemy.ext.asyncio import (
@@ -23,12 +24,16 @@ url = make_url(DATABASE_URL)
 if url.drivername == "postgresql":
     url = url.set(drivername="postgresql+asyncpg")
 
-# asyncpg does not accept these libpq parameters directly
+# asyncpg does not accept these libpq parameters directly — SSL is instead
+# enforced explicitly below via connect_args, with full certificate
+# verification against the system's trusted CA bundle.
 url = url.difference_update_query(
     ["sslmode", "channel_binding"]
 )
 
 ASYNC_DATABASE_URL = url.render_as_string(hide_password=False)
+
+ssl_context = ssl.create_default_context()
 
 engine = create_async_engine(
     ASYNC_DATABASE_URL,
@@ -37,6 +42,7 @@ engine = create_async_engine(
     pool_size=2,
     max_overflow=3,
     echo=False,
+    connect_args={"ssl": ssl_context},
 )
 
 AsyncSessionLocal = async_sessionmaker(
