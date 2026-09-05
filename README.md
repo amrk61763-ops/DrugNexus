@@ -11,10 +11,10 @@
 ## Live Demo
 
 **Website:**  
-https://drug-nexus.vercel.app/
+https://drugnexus.vercel.app/
 
 **Interactive API Documentation:**  
-https://drug-nexus.vercel.app/docs
+https://drugnexus.vercel.app/docs
 
 ---
 
