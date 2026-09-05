@@ -2,8 +2,8 @@
 
 > A scientific drug information platform connecting pharmaceutical products in the Egyptian market with active ingredients, chemical information, and structural data.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-informational)](https://drug-nexus.vercel.app/)
-[![API Docs](https://img.shields.io/badge/API-Swagger%20Docs-informational)](https://drug-nexus.vercel.app/docs)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-informational)](https://drugnexus.vercel.app/)
+[![API Docs](https://img.shields.io/badge/API-Swagger%20Docs-informational)](https://drugnexus.vercel.app/docs)
 [![License](https://img.shields.io/badge/License-Source--Available-lightgrey)](LICENSE)
 
 ---
