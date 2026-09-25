@@ -2,7 +2,7 @@
 """
 شكل الرد (response) الخاص بـendpoint تفاصيل المادة الفعالة - كل الحقول
 اللي جبناها من PubChem و ChEMBL (جدول ingredient_details)، بالإضافة لقائمة
-الأسماء التجارية اللي بتستخدم المادة دي.
+الأسماء التجارية اللي بتستخدم المادة دي والتفاعلات الدوائية الخاصة بها.
 """
 
 from pydantic import BaseModel
@@ -11,6 +11,16 @@ from pydantic import BaseModel
 class TradeNameUsingIngredient(BaseModel):
     trade_name: str
     manufacturer: str | None
+
+
+class DrugInteraction(BaseModel):
+    """صف واحد من جدول ingredient_drug_interactions."""
+    interaction_type: str
+    interacting_class_name: str | None
+    interacting_drug_name: str | None
+    interacting_drug_pubchem_cid: str | None
+    severity: str | None
+    mechanism_description: str | None
 
 
 class LigandFile(BaseModel):
@@ -54,4 +64,5 @@ class ActiveIngredientResponse(BaseModel):
     chembl_target_type: str | None
 
     used_in: list[TradeNameUsingIngredient]
+    interactions: list[DrugInteraction]
     pdb_structures: list[ReceptorStructure]

@@ -10,9 +10,18 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
-from .models import Drug, DrugIngredient, Ingredient, IngredientDetail, PdbLigand, PdbReceptor
+from .models import (
+    Drug,
+    DrugIngredient,
+    Ingredient,
+    IngredientDetail,
+    IngredientDrugInteraction,
+    PdbLigand,
+    PdbReceptor,
+)
 from .schemas.active_ingredient import (
     ActiveIngredientResponse,
+    DrugInteraction,
     LigandFile,
     ReceptorStructure,
     TradeNameUsingIngredient,
@@ -22,7 +31,6 @@ router = APIRouter(
     prefix="/active_ingredient",
     tags=["Active Ingredient"],
 )
-
 
 
 def _to_int(val):
@@ -53,6 +61,24 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         select(IngredientDetail).where(IngredientDetail.pubchem_cid == pubchem_cid)
     )
     details = result.scalar_one_or_none()
+
+    # 3.5. Fetch all drug-drug interactions for this active ingredient
+    result = await db.execute(
+        select(IngredientDrugInteraction)
+        .where(IngredientDrugInteraction.ingredient_pubchem_cid == pubchem_cid)
+        .order_by(IngredientDrugInteraction.id)
+    )
+    interactions = [
+        DrugInteraction(
+            interaction_type=ddi.interaction_type,
+            interacting_class_name=ddi.interacting_class_name,
+            interacting_drug_name=ddi.interacting_drug_name,
+            interacting_drug_pubchem_cid=ddi.interacting_drug_pubchem_cid,
+            severity=ddi.severity,
+            mechanism_description=ddi.mechanism_description,
+        )
+        for ddi in result.scalars().all()
+    ]
 
     # 4. Fetch ALL drugs containing this ingredient
     result = await db.execute(
@@ -165,5 +191,6 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         chembl_target_name=details.chembl_target_name if details else None,
         chembl_target_type=details.chembl_target_type if details else None,
         used_in=used_in_list,
+        interactions=interactions,
         pdb_structures=pdb_structures,
     )
