@@ -4,8 +4,13 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
-from .models import Drug, DrugIngredient, Ingredient
-from .schemas.trade_name import AlternativeDrug, IngredientSummary, TradeNameResponse
+from .models import Drug, DrugIngredient, Ingredient, IngredientDrugInteraction
+from .schemas.trade_name import (
+    AlternativeDrug,
+    DrugInteraction,
+    IngredientSummary,
+    TradeNameResponse,
+)
 
 
 router = APIRouter(
@@ -21,13 +26,42 @@ async def _get_active_ingredients(db: AsyncSession, drug_id: int) -> list[Ingred
         .where(DrugIngredient.drug_id == drug_id)
         .order_by(Ingredient.pubchem_cid)
     )
+    ingredients = result.scalars().all()
+
+    if not ingredients:
+        return []
+
+    # استعلام واحد لكل الـDDI بتاعة كل المواد الفعالة في الدواء ده مع
+    # بعض (بدل استعلام منفصل لكل مادة فعالة - نفس فلسفة active_ingredient.py
+    # مع الـligands)
+    cids = [ing.pubchem_cid for ing in ingredients]
+    result = await db.execute(
+        select(IngredientDrugInteraction)
+        .where(IngredientDrugInteraction.ingredient_pubchem_cid.in_(cids))
+        .order_by(IngredientDrugInteraction.id)
+    )
+    interactions_by_cid: dict[str, list[IngredientDrugInteraction]] = {}
+    for row in result.scalars().all():
+        interactions_by_cid.setdefault(row.ingredient_pubchem_cid, []).append(row)
+
     return [
         IngredientSummary(
-            pubchem_cid=i.pubchem_cid,
-            chembl_id=i.chembl_id,
-            display_name=i.display_name,
+            pubchem_cid=ing.pubchem_cid,
+            chembl_id=ing.chembl_id,
+            display_name=ing.display_name,
+            interactions=[
+                DrugInteraction(
+                    interaction_type=ddi.interaction_type,
+                    interacting_class_name=ddi.interacting_class_name,
+                    interacting_drug_name=ddi.interacting_drug_name,
+                    interacting_drug_pubchem_cid=ddi.interacting_drug_pubchem_cid,
+                    severity=ddi.severity,
+                    mechanism_description=ddi.mechanism_description,
+                )
+                for ddi in interactions_by_cid.get(ing.pubchem_cid, [])
+            ],
         )
-        for i in result.scalars().all()
+        for ing in ingredients
     ]
 
 

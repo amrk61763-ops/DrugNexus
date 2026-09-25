@@ -65,6 +65,30 @@ class IngredientDetail(Base):
     chembl_target_type: Mapped[str | None] = mapped_column()
 
 
+class IngredientDrugInteraction(Base):
+    """جدول التفاعلات الدوائية (DDI) - كل صف بيقول إن مادة فعالة معينة
+    (ingredient_pubchem_cid) بتتفاعل مع دواء تاني أو مجموعة أدوية تانية
+    (interacting_drug_name / interacting_class_name). لو الدواء التاني
+    ده نفسه مادة فعالة موجودة عندنا في جدول ingredients، بنسجل الـcid
+    بتاعه في interacting_drug_pubchem_cid (ممكن يبقى NULL لو مش موجود
+    عندنا أو لو التفاعل مع "class" كامل مش مادة واحدة بعينها)."""
+    __tablename__ = "ingredient_drug_interactions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ingredient_pubchem_cid: Mapped[str] = mapped_column(ForeignKey("ingredients.pubchem_cid"))
+    ingredient_chembl_id: Mapped[str | None] = mapped_column()
+    ingredient_name: Mapped[str | None] = mapped_column()
+    interaction_type: Mapped[str] = mapped_column()
+    interacting_class_name: Mapped[str | None] = mapped_column()
+    interacting_drug_name: Mapped[str | None] = mapped_column()
+    interacting_drug_chembl_id: Mapped[str | None] = mapped_column()
+    interacting_drug_pubchem_cid: Mapped[str | None] = mapped_column(
+        ForeignKey("ingredients.pubchem_cid")
+    )
+    severity: Mapped[str | None] = mapped_column()
+    mechanism_description: Mapped[str | None] = mapped_column()
+
+
 class PdbReceptor(Base):
     __tablename__ = "pdb_receptors"
 
@@ -98,6 +122,6 @@ class PdbLigand(Base):
 
 if __name__ == "__main__":
     # تشغيل الملف مباشرة (مش عن طريق FastAPI) بيوريك إن الوصف اتقرا صح
-    for model in (Drug, Ingredient, DrugIngredient, IngredientDetail):
+    for model in (Drug, Ingredient, DrugIngredient, IngredientDetail, IngredientDrugInteraction):
         cols = [c.name for c in model.__table__.columns]
         print(f"{model.__tablename__}: {cols}")
