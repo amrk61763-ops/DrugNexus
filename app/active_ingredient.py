@@ -6,7 +6,7 @@
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
@@ -62,10 +62,28 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
     )
     details = result.scalar_one_or_none()
 
-    # 3.5. Fetch all drug-drug interactions for this active ingredient
+    # 3.5. Fetch all drug-drug interactions for this active ingredient.
+    # Some imported interaction rows contain leading/trailing whitespace or
+    # store the CID with a different SQL type.  Normalize both values before
+    # comparing them.  The ingredient-name fallback also supports legacy rows
+    # whose CID was not populated correctly during import.
+    normalized_cid = str(pubchem_cid).strip().lower()
+    normalized_name = ingredient.display_name.strip().lower()
+    interaction_cid = func.lower(
+        func.trim(cast(IngredientDrugInteraction.ingredient_pubchem_cid, String))
+    )
+    interaction_name = func.lower(
+        func.trim(cast(IngredientDrugInteraction.ingredient_name, String))
+    )
+
     result = await db.execute(
         select(IngredientDrugInteraction)
-        .where(IngredientDrugInteraction.ingredient_pubchem_cid == pubchem_cid)
+        .where(
+            or_(
+                interaction_cid == normalized_cid,
+                interaction_name == normalized_name,
+            )
+        )
         .order_by(IngredientDrugInteraction.id)
     )
     interactions = [
@@ -89,11 +107,6 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
     all_drugs = result.scalars().all()
 
     # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
-    # pubchem_cid في pdb_receptors عمود jsonb - أحيانًا رقم مفرد وأحيانًا
-    # array من أرقام. .contains() العادي بيبعت الرقم كـINTEGER من غير ما
-    # يحوّله لـjsonb (وده كان بيرمي jsonb @> integer)، فبنستخدم دالة
-    # to_jsonb() الصريحة من بوستجرس عشان نضمن الكاست الصح، وده نفس
-    # الكويري اللي جربناها على الداتابيز الحقيقية واشتغلت.
     cid_int = _to_int(pubchem_cid)
     receptors = []
     if cid_int is not None:
@@ -108,9 +121,6 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
 
     if receptors:
         receptor_pdb_ids = [r.pdb_id for r in receptors]
-
-        # استعلام واحد لكل الـligands بتوع كل الـreceptors مع بعض
-        # (بدل استعلام منفصل لكل receptor - نفس فلسفة trade_name.py)
         result = await db.execute(
             select(PdbLigand).where(PdbLigand.pdb_id.in_(receptor_pdb_ids))
         )
@@ -119,6 +129,8 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         ligands_by_pdb_id: dict[str, list[PdbLigand]] = {}
         for lig in all_ligands:
             ligands_by_pdb_id.setdefault(lig.pdb_id, []).append(lig)
+    else:
+        ligands_by_pdb_id = {}
 
     pdb_structures = [
         ReceptorStructure(
@@ -143,30 +155,23 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
     ]
 
     # 5. Process drugs to extract the base name (prefix) and remove duplicates
-    # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
-    # We use a dictionary to store unique base names and keep the first occurrence's manufacturer
     unique_drugs_map = {}
-
     for drug in all_drugs:
         trade_name = drug.trade_name
         if not trade_name:
             continue
 
-        # Split by space to get the first word (the base name/prefix)
         base_name = trade_name.split()[0]
-
-        # Only add if we haven't seen this base name yet
         if base_name not in unique_drugs_map:
             unique_drugs_map[base_name] = {
                 "trade_name": base_name,
-                "manufacturer": drug.manufacturer
+                "manufacturer": drug.manufacturer,
             }
 
-    # Convert the map back to a list of objects for the response
     used_in_list = [
         TradeNameUsingIngredient(
             trade_name=data["trade_name"],
-            manufacturer=data["manufacturer"]
+            manufacturer=data["manufacturer"],
         )
         for data in unique_drugs_map.values()
     ]
