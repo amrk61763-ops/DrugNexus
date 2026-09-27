@@ -392,21 +392,33 @@
                   </svg>
                 </button>
 
-                <!-- live suggestions — top 5 generic-name groups, updates as the user types -->
-                <div x-show="tradeSuggestOpen && tradeSuggestions.length > 0" x-cloak x-transition
+                <!-- live suggestions — top 5 generic-name groups, updates as the user types.
+                     Solid, contrasting panel (not the page's own background) so it reads as
+                     floating above the content behind it; opens immediately with a loading
+                     row so typing never feels unresponsive. -->
+                <div x-show="tradeSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-[#FAFAF9] dark:bg-[#0A0A0A] backdrop-blur-xl border border-hair dark:border-dhair
-                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.8)] ring-1 ring-black/5 dark:ring-white/10">
-                    <template x-for="(g, i) in tradeSuggestions" :key="g.key + i">
-                      <button type="button" @click="pickTradeSuggestion(g)"
-                              class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
-                        <span>
-                          <span class="text-sm font-semibold" x-text="g.key"></span>
-                          <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="g.items[0].manufacturer"></span>
-                        </span>
-                        <span x-show="g.items.length > 1" class="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="g.items.length + ' variants'"></span>
-                      </button>
-                    </template>
+                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
+                    <div x-show="tradeSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
+                      <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                      </svg>
+                      <span class="text-[13px]">Searching…</span>
+                    </div>
+                    <div x-show="!tradeSuggestLoading">
+                      <template x-for="(g, i) in tradeSuggestions" :key="g.key + i">
+                        <button type="button" @click="pickTradeSuggestion(g)"
+                                class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                          <span>
+                            <span class="text-sm font-semibold" x-text="g.key"></span>
+                            <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="g.items[0].manufacturer"></span>
+                          </span>
+                          <span x-show="g.items.length > 1" class="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="g.items.length + ' variants'"></span>
+                        </button>
+                      </template>
+                    </div>
                 </div>
               </form>
 
@@ -470,7 +482,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
-                <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
+                <article x-ref="tradeMain" class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <div class="flex items-start justify-between gap-4">
                       <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="drug.trade_name"></h4>
@@ -532,9 +544,9 @@
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="allInteractions.length + ' pairs'"></span>
                       </div>
-                      <ul class="divide-y divide-hair dark:divide-dhair">
+                      <ul class="grid sm:grid-cols-2 gap-px bg-hair dark:bg-dhair max-h-[560px] overflow-y-auto thin-scroll">
                         <template x-for="(ix, i) in allInteractions" :key="i">
-                          <li class="px-6 sm:px-8 py-5">
+                          <li class="px-6 sm:px-8 py-5 bg-paper dark:bg-coal">
                             <div class="flex flex-wrap items-center gap-2.5">
                               <span class="font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="ix.ingredient"></span>
                               <span class="font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 rounded-full text-paper dark:text-coal"
@@ -561,10 +573,13 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — alternatives (grouped by generic name, expandable by route/form) -->
-                <!-- Stretched to match the main article's height; the group list scrolls inside it. -->
-                <aside class="lg:col-span-3 lg:sticky lg:top-24 h-full">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-full flex flex-col">
+                <!-- SIDEBAR — alternatives (grouped by generic name, expandable by route/form).
+                     A normal card like any other on the page, just capped to the main
+                     article's measured height so it never grows taller than it; the group
+                     list scrolls inside it once it runs out of room. -->
+                <aside class="lg:col-span-3" x-init="$nextTick(() => observeHeight($refs.tradeMain, h => tradeSidebarH = h))">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col"
+                       :style="tradeSidebarH ? ('max-height:' + tradeSidebarH + 'px') : ''">
                     <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">Alternative Drugs</h5>
                     <p x-show="!hasAlternativesData" class="text-sm text-mute dark:text-[#9C9CA3]">Alternatives are not available from this endpoint yet.</p>
                     <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No alternatives in the database.</p>
@@ -633,17 +648,26 @@
                 </button>
 
                 <!-- live suggestions — top 5, updates as the user types -->
-                <div x-show="ingSuggestOpen && ingSuggestions.length > 0" x-cloak x-transition
+                <div x-show="ingSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-[#FAFAF9] dark:bg-[#0A0A0A] backdrop-blur-xl border border-hair dark:border-dhair
-                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.8)] ring-1 ring-black/5 dark:ring-white/10">
-                  <template x-for="(s, i) in ingSuggestions" :key="(s.display_name || s) + i">
-                    <button type="button" @click="pickIngSuggestion(s)"
-                            class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
-                      <span class="text-sm font-semibold" x-text="s.display_name || s"></span>
-                      <span x-show="s.molecular_formula" class="font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="s.molecular_formula"></span>
-                    </button>
-                  </template>
+                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
+                  <div x-show="ingSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
+                    <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span class="text-[13px]">Searching…</span>
+                  </div>
+                  <div x-show="!ingSuggestLoading">
+                    <template x-for="(s, i) in ingSuggestions" :key="(s.display_name || s) + i">
+                      <button type="button" @click="pickIngSuggestion(s)"
+                              class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                        <span class="text-sm font-semibold" x-text="s.display_name || s"></span>
+                        <span x-show="s.molecular_formula" class="font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="s.molecular_formula"></span>
+                      </button>
+                    </template>
+                  </div>
                 </div>
               </form>
 
@@ -680,7 +704,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
-                <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
+                <article x-ref="ingMain" class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="ing.display_name"></h4>
                     <p x-show="ing.molecular_formula" class="mt-2 font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.molecular_formula"></p>
@@ -781,9 +805,9 @@
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="(ing.interactions || []).length + ' pairs'"></span>
                       </div>
                       <p x-show="!ing.interactions || ing.interactions.length === 0" class="px-6 sm:px-8 py-6 text-sm text-mute dark:text-[#9C9CA3]">No known interactions recorded for this ingredient.</p>
-                      <ul class="divide-y divide-hair dark:divide-dhair">
+                      <ul class="grid sm:grid-cols-2 gap-px bg-hair dark:bg-dhair max-h-[560px] overflow-y-auto thin-scroll">
                         <template x-for="(ix, i) in (ing.interactions || [])" :key="i">
-                          <li class="px-6 sm:px-8 py-5">
+                          <li class="px-6 sm:px-8 py-5 bg-paper dark:bg-coal">
                             <div class="flex flex-wrap items-center gap-2.5">
                               <span class="font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 rounded-full text-paper dark:text-coal"
                                     :class="sevFilled(ix.severity) ? 'bg-ink dark:bg-snow' : 'border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]'"
@@ -807,9 +831,11 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — used in. Stretched to match the article's height; list scrolls inside it. -->
-                <aside class="lg:col-span-3 lg:sticky lg:top-24 h-full">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-full flex flex-col">
+                <!-- SIDEBAR — used in. A normal card capped to the article's measured
+                     height; the list scrolls inside it once it runs out of room. -->
+                <aside class="lg:col-span-3" x-init="$nextTick(() => observeHeight($refs.ingMain, h => ingSidebarH = h))">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col"
+                       :style="ingSidebarH ? ('max-height:' + ingSidebarH + 'px') : ''">
                     <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
                       Used in Trade Names <span x-text="'(' + ing.used_in.length + ')'"></span>
                     </h5>
@@ -837,47 +863,47 @@
                     <span class="font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.pdb_structures.length + ' structure(s)'"></span>
                   </div>
 
-                  <div class="grid grid-cols-1 gap-8">
+                  <div class="grid grid-cols-1 gap-10">
                     <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
                       <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-[#141416]">
-                        <div class="grid grid-cols-1 lg:grid-cols-5">
-                          <!-- interactive 3Dmol viewer — the dominant element of the card -->
-                          <div class="lg:col-span-3 relative h-[340px] sm:h-[440px] lg:h-[520px] overflow-hidden bg-zinc-50 dark:bg-coal border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
-                               x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
-                            <span class="pointer-events-none absolute bottom-3 right-3 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/80 dark:bg-coal/80 backdrop-blur px-2.5 py-1 rounded-full">
-                              Drag to rotate · scroll to zoom
-                            </span>
+                        <!-- interactive 3Dmol viewer — full-width and tall: this is the
+                             main content of the card, not a thumbnail beside the specs -->
+                        <div class="relative h-[420px] sm:h-[560px] lg:h-[640px] w-full overflow-hidden bg-zinc-50 dark:bg-coal border-b border-hair dark:border-dhair"
+                             x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
+                          <span class="pointer-events-none absolute top-4 left-4 font-mono text-sm font-bold tracking-tight bg-paper/85 dark:bg-coal/85 backdrop-blur px-3 py-1.5 rounded-full" x-text="pdb.pdb_id"></span>
+                          <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
+                            Drag to rotate · scroll to zoom
+                          </span>
+                        </div>
+                        <!-- metadata strip -->
+                        <div class="p-7 sm:p-9 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-7">
+                          <div class="shrink-0">
+                            <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3]">Source: RCSB PDB</p>
+                            <h5 class="mt-1 text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
                           </div>
-                          <!-- metadata -->
-                          <div class="lg:col-span-2 p-7 sm:p-9 flex flex-col justify-between gap-8">
-                            <div>
-                              <h5 class="text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
-                              <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3] mt-1">Source: RCSB PDB</p>
-                              <dl class="mt-6 space-y-3 text-sm">
-                                <div x-show="pdb.experiment_method" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
-                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Method</dt>
-                                  <dd class="font-semibold text-right" x-text="pdb.experiment_method"></dd>
-                                </div>
-                                <div x-show="pdb.resolution" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
-                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Resolution</dt>
-                                  <dd class="font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
-                                </div>
-                                <div class="flex justify-between">
-                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Ligands extracted</dt>
-                                  <dd>
-                                    <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
-                                       class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
-                                    <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
-                                  </dd>
-                                </div>
-                              </dl>
+                          <dl class="flex flex-wrap gap-x-10 gap-y-4 text-sm">
+                            <div x-show="pdb.experiment_method">
+                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Method</dt>
+                              <dd class="mt-1.5 font-semibold" x-text="pdb.experiment_method"></dd>
                             </div>
-                            <a :href="pdb.download_url" target="_blank"
-                               class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-[13px] font-semibold
-                                      bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
-                              Download receptor (.pdb)
-                            </a>
-                          </div>
+                            <div x-show="pdb.resolution">
+                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Resolution</dt>
+                              <dd class="mt-1.5 font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
+                            </div>
+                            <div>
+                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Ligands extracted</dt>
+                              <dd class="mt-1.5">
+                                <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
+                                   class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
+                                <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
+                              </dd>
+                            </div>
+                          </dl>
+                          <a :href="pdb.download_url" target="_blank"
+                             class="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[13px] font-semibold
+                                    bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
+                            Download receptor (.pdb)
+                          </a>
                         </div>
                       </div>
                     </template>
@@ -958,7 +984,15 @@
         // Groups a list of trade-name results by the same generic name that alternativeGroups uses,
         // so "a" doesn't return five products that are really the same drug in different doses/forms.
         genericKey(item) {
-          return item.generic_name || item.active_ingredient || item.trade_name;
+          if (item.generic_name) return item.generic_name;
+          if (item.active_ingredient) return item.active_ingredient;
+          // No generic-name field on this record (common on lightweight suggestion
+          // results) — fall back to the shared first word of the trade name, so
+          // "Augmentin 1g" and "Augmentin Syrup" collapse into one group instead
+          // of appearing as separate, near-duplicate suggestions.
+          const name = (item.trade_name || '').trim();
+          const firstWord = name.split(/[\s\-]+/)[0];
+          return firstWord || name || 'unknown';
         },
         groupByGeneric(list, limit) {
           const order = [];
@@ -971,38 +1005,67 @@
           return order.slice(0, limit).map(k => groups[k]);
         },
 
+        // ---- Sidebar height sync: caps each sidebar card at the height of its
+        // main-content sibling, so it never grows taller than the left column;
+        // the sidebar's own list scrolls internally for anything that overflows. ----
+        tradeSidebarH: null,
+        ingSidebarH: null,
+        observeHeight(el, cb) {
+          if (!el || typeof ResizeObserver === 'undefined') return;
+          const ro = new ResizeObserver(entries => {
+            for (const entry of entries) cb(Math.round(entry.contentRect.height));
+          });
+          ro.observe(el);
+          cb(el.offsetHeight);
+        },
+
         // ---- Live search suggestions (max 5 groups, as the user types) ----
         tradeSuggestions: [],
         tradeSuggestOpen: false,
+        tradeSuggestLoading: false,
         tradeSuggestTimer: null,
         tradeSuggestAbort: null,
         ingSuggestions: [],
         ingSuggestOpen: false,
+        ingSuggestLoading: false,
         ingSuggestTimer: null,
         ingSuggestAbort: null,
 
         onTradeType() {
           clearTimeout(this.tradeSuggestTimer);
           const q = this.tradeQuery.trim();
-          if (!q) { this.tradeSuggestions = []; this.tradeSuggestOpen = false; if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort(); return; }
+          if (!q) {
+            this.tradeSuggestions = [];
+            this.tradeSuggestOpen = false;
+            this.tradeSuggestLoading = false;
+            if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort();
+            return;
+          }
+          // Open the panel with a loading row right away — typing never feels stalled
+          // while the request is in flight, even before any results come back.
+          this.tradeSuggestOpen = true;
+          this.tradeSuggestLoading = true;
           // Short debounce + an abort on every fresh keystroke: a slow, stale request never blocks the next one.
-          this.tradeSuggestTimer = setTimeout(() => this.fetchTradeSuggestions(q), 120);
+          this.tradeSuggestTimer = setTimeout(() => this.fetchTradeSuggestions(q), 80);
         },
         async fetchTradeSuggestions(q) {
           if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort();
           const controller = new AbortController();
           this.tradeSuggestAbort = controller;
+          this.tradeSuggestLoading = true;
           try {
             const res = await fetch(`${API_BASE}/trade_name/${encodeURIComponent(q)}`, { signal: controller.signal });
-            if (!res.ok) { this.tradeSuggestions = []; this.tradeSuggestOpen = false; return; }
+            if (!res.ok) { this.tradeSuggestions = []; this.tradeSuggestOpen = false; this.tradeSuggestLoading = false; return; }
             const data = await res.json();
             const list = Array.isArray(data) ? data : [data];
             this.tradeSuggestions = this.groupByGeneric(list, 5);
+            this.tradeSuggestLoading = false;
             this.tradeSuggestOpen = this.tradeSuggestions.length > 0 && this.tradeQuery.trim() === q;
           } catch (err) {
             if (err.name === 'AbortError') return; // superseded by a newer keystroke — ignore
             this.tradeSuggestions = [];
             this.tradeSuggestOpen = false;
+            this.tradeSuggestLoading = false;
           }
         },
         pickTradeSuggestion(group) {
@@ -1015,8 +1078,16 @@
         onIngType() {
           clearTimeout(this.ingSuggestTimer);
           const q = this.ingQuery.trim();
-          if (!q) { this.ingSuggestions = []; this.ingSuggestOpen = false; if (this.ingSuggestAbort) this.ingSuggestAbort.abort(); return; }
-          this.ingSuggestTimer = setTimeout(() => this.fetchIngSuggestions(q), 120);
+          if (!q) {
+            this.ingSuggestions = [];
+            this.ingSuggestOpen = false;
+            this.ingSuggestLoading = false;
+            if (this.ingSuggestAbort) this.ingSuggestAbort.abort();
+            return;
+          }
+          this.ingSuggestOpen = true;
+          this.ingSuggestLoading = true;
+          this.ingSuggestTimer = setTimeout(() => this.fetchIngSuggestions(q), 80);
         },
         async fetchIngSuggestions(q) {
           // Assumes a lightweight search endpoint alongside the exact-match detail endpoint.
@@ -1024,17 +1095,20 @@
           if (this.ingSuggestAbort) this.ingSuggestAbort.abort();
           const controller = new AbortController();
           this.ingSuggestAbort = controller;
+          this.ingSuggestLoading = true;
           try {
             const res = await fetch(`${API_BASE}/active_ingredient/search/${encodeURIComponent(q)}`, { signal: controller.signal });
-            if (!res.ok) { this.ingSuggestions = []; this.ingSuggestOpen = false; return; }
+            if (!res.ok) { this.ingSuggestions = []; this.ingSuggestOpen = false; this.ingSuggestLoading = false; return; }
             const data = await res.json();
             const list = Array.isArray(data) ? data : [data];
             this.ingSuggestions = list.slice(0, 5);
+            this.ingSuggestLoading = false;
             this.ingSuggestOpen = this.ingSuggestions.length > 0 && this.ingQuery.trim() === q;
           } catch (err) {
             if (err.name === 'AbortError') return;
             this.ingSuggestions = [];
             this.ingSuggestOpen = false;
+            this.ingSuggestLoading = false;
           }
         },
         pickIngSuggestion(s) {
