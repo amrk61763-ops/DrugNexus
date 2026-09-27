@@ -36,6 +36,7 @@ async def health():
 # Serves the frontend (index.html and friends) at "/" and any non-API path.
 # StaticFiles(html=True) serves index.html for the directory itself; API
 # routes registered above still resolve first because mounts are checked last.
-_FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_FRONTEND_DIR = os.path.join(_BASE_DIR, "frontend")
 if os.path.isdir(_FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=_FRONTEND_DIR, html=True), name="frontend")
