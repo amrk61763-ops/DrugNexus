@@ -1,5 +1,6 @@
 import os
 import ssl
+from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import make_url
 from sqlalchemy.ext.asyncio import (
@@ -9,14 +10,16 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import declarative_base
 
-load_dotenv()
+# Load .env from project root (parent of app/ directory)
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
     raise RuntimeError(
         "DATABASE_URL environment variable is missing. "
-        "Add it in Vercel Project Settings."
+        "Add it in .env file or in Vercel Project Settings."
     )
 
 url = make_url(DATABASE_URL)
