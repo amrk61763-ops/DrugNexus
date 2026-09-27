@@ -274,9 +274,9 @@
           <img src="assets/microscope.jpg" alt="Researcher at a microscope" class="absolute inset-0 w-full h-full object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.03]" loading="lazy" />
           <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
           <div class="absolute bottom-4 left-4 right-4 bg-paper dark:bg-coal backdrop-blur-2xl rounded-2xl p-6 border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.9)]">
-            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9C9CA3] dark:text-[#9C9CA3] mb-2">Feature — 01</p>
-            <h3 class="text-lg text-[#9C9CA3] dark:text-[#9C9CA3] font-bold">Pharmacology Data</h3>
-            <p class="mt-1.5 text-sm text-[#9C9CA3] dark:text-[#9C9CA3] leading-relaxed">Full pharmacological profiles for every active ingredient — indication, half-life, pharmacodynamics.</p>
+            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#FAFAF9] dark:text-[#FAFAF9] mb-2">Feature — 01</p>
+            <h3 class="text-lg text-[#FAFAF9] dark:text-[#FAFAF9] font-bold">Pharmacology Data</h3>
+            <p class="mt-1.5 text-sm text-[#FAFAF9] dark:text-[#FAFAF9] leading-relaxed">Full pharmacological profiles for every active ingredient — indication, half-life, pharmacodynamics.</p>
           </div>
         </div>
         <div class="md:col-span-7 bg-paper dark:bg-coal p-8 sm:p-10 flex flex-col justify-center gap-6">
@@ -302,10 +302,10 @@
         <div class="md:col-span-12 bg-paper dark:bg-coal relative min-h-[300px] overflow-hidden group">
           <img src="assets/lab-vintage.jpg" alt="Vintage pharmaceutical laboratory" class="absolute inset-0 w-full h-full object-cover object-center opacity-90 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.02]" loading="lazy" />
           <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-transparent"></div>
-          <div class="absolute top-1/2 -translate-y-1/2 left-4 right-4 sm:right-auto sm:max-w-md bg-white/95 dark:bg-[#161618]/95 backdrop-blur-2xl rounded-2xl p-6 border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.9)]">
-            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-2">Feature — 02</p>
-            <h3 class="text-2xl font-bold tracking-tight">Structural Evidence</h3>
-            <p class="mt-2 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">Every claim is anchored to a structure — receptor PDBs from RCSB, ligands validated by crystallographic metrics.</p>
+          <div class="absolute top-1/2 -translate-y-1/2 left-4 right-4 sm:right-auto sm:max-w-md bg-paper dark:bg-coal backdrop-blur-2xl rounded-2xl p-6 border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.9)]">
+            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#FAFAF9] dark:text-[#FAFAF9] mb-2">Feature — 02</p>
+            <h3 class="text-2xl font-bold text-[#FAFAF9] dark:text-[#FAFAF9] tracking-tight">Structural Evidence</h3>
+            <p class="mt-2 text-sm text-[#FAFAF9] dark:text-[#FAFAF9] leading-relaxed">Every claim is anchored to a structure — receptor PDBs from RCSB, ligands validated by crystallographic metrics.</p>
           </div>
         </div>
       </div>
@@ -397,7 +397,7 @@
                 <!-- live suggestions — fast dedicated endpoint, min 2 chars, aborts stale requests -->
                 <div x-show="tradeSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            bg-white dark:bg-coal border border-hair dark:border-dhair
                             shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                     <div x-show="tradeSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                       <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
@@ -555,7 +555,7 @@
 
                     <!-- ===== DDI PANEL ===== -->
                     <div x-show="hasIngredientData && allInteractions.length > 0" class="border border-hair dark:border-dhair rounded-3xl overflow-hidden">
-                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-[#1C1C1E]">
+                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-coal">
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="allInteractions.length + ' pairs'"></span>
                       </div>
@@ -682,7 +682,7 @@
                 <!-- live suggestions — fast dedicated endpoint -->
                 <div x-show="ingSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            bg-white dark:bg-coal border border-hair dark:border-dhair
                             shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                   <div x-show="ingSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                     <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
@@ -833,7 +833,7 @@
 
                     <!-- ===== DDI ===== -->
                     <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden">
-                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-[#1C1C1E]">
+                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-coal">
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="(ing.interactions || []).length + ' pairs'"></span>
                       </div>
@@ -889,17 +889,17 @@
                   <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
                     <div>
                       <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-1.5">Structural Evidence</p>
-                      <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest">Receptor structures</h4>
+                      <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest">protine structures</h4>
                     </div>
                     <span class="font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.pdb_structures.length + ' structure(s)'"></span>
                   </div>
 
                   <div class="grid grid-cols-1 gap-10">
                     <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
-                      <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-[#1C1C1E]
+                      <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-coal
                                   grid grid-cols-1 lg:grid-cols-2">
                         <!-- left half: the interactive 3D view is the hero -->
-                        <div class="relative h-[380px] sm:h-[480px] lg:h-auto lg:min-h-[480px] w-full overflow-hidden bg-zinc-50 dark:bg-coal border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
+                        <div class="relative h-[380px] sm:h-[480px] lg:h-auto lg:min-h-[480px] w-full overflow-hidden bg-zinc-50 dark:bg-dhair border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
                              x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
                           <span class="pointer-events-none absolute top-4 left-4 font-mono text-sm font-bold tracking-tight bg-paper/85 dark:bg-coal/85 backdrop-blur px-3 py-1.5 rounded-full" x-text="pdb.pdb_id"></span>
                           <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#8E8E96] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
@@ -958,7 +958,7 @@
 
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
                       <template x-for="lig in allLigands" :key="lig.pdb_id + '_' + lig.ligand_file_name">
-                        <div class="border border-hair dark:border-dhair rounded-3xl p-5 flex flex-col bg-white dark:bg-[#1C1C1E]">
+                        <div class="border border-hair dark:border-dhair rounded-3xl p-5 flex flex-col bg-white dark:bg-dhair">
                           <div class="flex items-center justify-between gap-2 mb-3">
                             <span class="font-mono text-[11px] px-2 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="lig.pdb_id"></span>
                             <span x-show="lig.resolution" class="text-[11px] font-semibold font-mono" x-text="lig.resolution + ' Å'"></span>
