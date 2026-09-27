@@ -41,6 +41,13 @@
     }
 
     // Theme boot — before first paint to avoid flash.
+    // Swap logo (and any element marked data-logo) when the theme flips.
+    function swapLogo(dark) {
+      document.querySelectorAll('img[data-logo]').forEach(function (img) {
+        img.src = dark ? 'assets/logo-white.png' : 'assets/logo.png';
+      });
+    }
+
     (function () {
       const mq = window.matchMedia('(prefers-color-scheme: dark)');
       const apply = (dark) => {
@@ -48,9 +55,11 @@
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
       };
       const saved = localStorage.getItem('viadrug-theme');
-      apply(saved ? saved === 'dark' : mq.matches);
+      const startDark = saved ? saved === 'dark' : mq.matches;
+      apply(startDark);
+      swapLogo(startDark);
       mq.addEventListener('change', (e) => {
-        if (!localStorage.getItem('viadrug-theme')) apply(e.matches);
+        if (!localStorage.getItem('viadrug-theme')) { apply(e.matches); swapLogo(e.matches); }
       });
     })();
   </script>
@@ -94,6 +103,10 @@
     .dark .receptor-view  { background-color: #1C1C1E; }
     .ligand-card    { background-color: #FFFFFF; }
     .dark .ligand-card    { background-color: #1C1C1E; }
+    .struct-card { background-color: #FFFFFF; }
+    .dark .struct-card { background-color: #1C1C1E; }
+    .suggest-item:hover { background-color: #F4F4F5; }
+    .dark .suggest-item:hover { background-color: rgba(255, 255, 255, 0.12); }
   </style>
 </head>
 
@@ -103,8 +116,8 @@
   <header class="sticky top-0 z-50 bg-paper/85 dark:bg-coal/85 backdrop-blur-xl border-b border-hair dark:border-dhair">
     <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="/" class="flex items-center gap-1 group">
-        <span class="w-6 h-6 rounded-full bg-ink dark:bg-snow grid place-items-center transition-transform duration-500 group-hover:rotate-180">
-          <img src="assets/logo.png" alt="logo" class="w-5 h-5 ">
+        <span class="w-6 h-6 rounded-full bg-ink dark:bg-dhair grid place-items-center transition-transform duration-500 group-hover:rotate-180">
+          <img src="assets/logo.png" data-logo alt="logo" class="w-5 h-5">
         </span>
         <span class="text-[15px] font-bold tracking-tight">ViaDrug</span>
       </a>
@@ -422,7 +435,7 @@
                       <p x-show="tradeSuggestions.length === 0" class="px-5 py-3.5 text-[13px] text-mute dark:text-[#9C9CA3]">No matches — press Enter to search anyway.</p>
                       <template x-for="(g, i) in tradeSuggestions" :key="g.key + i">
                         <button type="button" @click="pickTradeSuggestion(g)"
-                                class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                                class="w-full flex items-center justify-between gap-3 px-5 py-3 suggest-item transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
                           <span>
                             <span class="text-sm font-semibold" x-text="g.key"></span>
                             <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="g.items[0].manufacturer"></span>
@@ -707,7 +720,7 @@
                     <p x-show="ingSuggestions.length === 0" class="px-5 py-3.5 text-[13px] text-mute dark:text-[#9C9CA3]">No matches — press Enter to search anyway.</p>
                     <template x-for="(s, i) in ingSuggestions" :key="(s.display_name || s) + i">
                       <button type="button" @click="pickIngSuggestion(s)"
-                              class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                              class="w-full flex items-center justify-between gap-3 px-5 py-3 suggest-item transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
                         <span class="text-sm font-semibold" x-text="s.display_name || s"></span>
                         <span x-show="s.molecular_formula" class="font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="s.molecular_formula"></span>
                       </button>
@@ -901,14 +914,14 @@
                   <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
                     <div>
                       <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-1.5">Structural Evidence</p>
-                      <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest">protine structures</h4>
+                      <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest">Protein structures</h4>
                     </div>
                     <span class="font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.pdb_structures.length + ' structure(s)'"></span>
                   </div>
 
                   <div class="grid grid-cols-1 gap-10">
                     <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
-                      <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-coal
+                      <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden struct-card
                                   grid grid-cols-1 lg:grid-cols-2">
                         <!-- left half: the interactive 3D view is the hero -->
                         <div class="relative h-[380px] sm:h-[480px] lg:h-auto lg:min-h-[480px] w-full overflow-hidden receptor-view border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
@@ -959,7 +972,7 @@
 
                 <!-- ===== LIGAND FILES ===== -->
                 <div x-show="allLigands.length > 0" id="ligand-files" class="lg:col-span-10">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-7 sm:p-10">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-7 sm:p-10 struct-card">
                     <div class="flex items-end justify-between gap-4 mb-8 flex-wrap">
                       <div>
                         <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-1.5">Structural Evidence</p>
@@ -1040,7 +1053,7 @@
                     <p x-show="listSuggestions.length === 0" class="px-5 py-3.5 text-[13px] text-mute dark:text-[#9C9CA3]">No matches.</p>
                     <template x-for="(g, i) in listSuggestions" :key="g.key + i">
                       <button type="button" @click="addToList(g)"
-                              class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                              class="w-full flex items-center justify-between gap-3 px-5 py-3 suggest-item transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
                         <span>
                           <span class="text-sm font-semibold" x-text="g.key"></span>
                           <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="g.items[0].manufacturer"></span>
@@ -1576,6 +1589,7 @@
       const dark = root.classList.toggle('dark');
       root.style.colorScheme = dark ? 'dark' : 'light';
       localStorage.setItem('viadrug-theme', dark ? 'dark' : 'light');
+      swapLogo(dark);
     }
   </script>
 
@@ -1593,8 +1607,8 @@
     <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
       <div>
         <a href="/" class="inline-flex items-center gap-2.5">
-          <span class="w-5 h-5 rounded-full bg-ink dark:bg-snow grid place-items-center">
-            <img src="assets/logo.png" alt="logo" class="w-5 h-5 ">
+          <span class="w-5 h-5 rounded-full bg-ink dark:bg-dhair grid place-items-center">
+            <img src="assets/logo.png" data-logo alt="logo" class="w-5 h-5">
           </span>
           <span class="text-[15px] font-bold tracking-tight">ViaDrug</span>
         </a>
