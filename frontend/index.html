@@ -1165,7 +1165,7 @@
                             <template x-for="(ix, i) in (ai.interactions || [])" :key="i">
                               <div class="px-4 py-3.5">
                                 <div class="flex flex-wrap items-center gap-2">
-                                  <span class="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-full text-paper dark:text-coal"
+                                  <span class="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-full text-mute dark:text-[#9C9CA3]"
                                         :class="sevFilled(ix.severity) ? 'bg-ink dark:bg-snow' : 'border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]'"
                                         x-text="ix.severity || 'unknown'"></span>
                                   <span x-show="ix.interaction_type" class="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="ix.interaction_type"></span>
