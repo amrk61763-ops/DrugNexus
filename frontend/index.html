@@ -592,44 +592,122 @@
                      "Used in Trade Names" aside on the ingredient page: the card
                      keeps a set height and only the list scrolls inside it.
                      Content stays exactly as before (grouped by generic name). -->
-                <aside class="lg:col-span-3">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 max-h-[560px] flex flex-col">
-                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
-                      Alternative Drugs <span x-show="hasAlternativesData && drug.alternatives.length > 0" x-text="'(' + drug.alternatives.length + ')'"></span>
-                    </h5>
-                    <p x-show="!hasAlternativesData" class="text-sm text-mute dark:text-[#9C9CA3]">Alternatives are not available from this endpoint yet.</p>
-                    <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No alternatives with the exact same ingredient set.</p>
-                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" class="grid gap-2.5 overflow-y-auto thin-scroll pr-1">
-                      <template x-for="group in alternativeGroups" :key="group.key">
-                        <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
-                          <button type="button" @click="toggleAltGroup(group.key)"
-                                  class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                            <span>
-                              <span class="font-bold text-sm" x-text="group.key"></span>
-                              <span class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')"></span>
-                            </span>
-                            <svg class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]" :class="openAltGroups.includes(group.key) ? 'rotate-180' : ''"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/></svg>
-                          </button>
-                          <div x-show="openAltGroups.includes(group.key)" x-cloak class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
-                            <template x-for="alt in group.items" :key="alt.trade_name + (alt.manufacturer || '')">
-                              <button type="button" @click="tradeQuery = alt.trade_name; searchTrade()"
-                                      class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                                <span class="font-semibold text-sm" x-text="alt.trade_name"></span>
-                                <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="alt.manufacturer"></p>
-                              </button>
-                            </template>
+                <style>
+                  [x-cloak] {
+                    display: none !important;
+                  }
+                </style>
+                
+                <div x-data="drugPage">
+                
+                  <aside class="lg:col-span-3">
+                    <div class="border border-hair dark:border-dhair rounded-3xl p-6 max-h-[560px] flex flex-col">
+                
+                      <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
+                        Alternative Drugs
+                
+                        <span
+                          x-show="hasAlternativesData && drug.alternatives.length > 0"
+                          x-cloak
+                          x-text="'(' + drug.alternatives.length + ')'">
+                        </span>
+                      </h5>
+                
+                      <p
+                        x-show="!hasAlternativesData"
+                        x-cloak
+                        class="text-sm text-mute dark:text-[#9C9CA3]">
+                        Alternatives are not available from this endpoint yet.
+                      </p>
+                
+                      <p
+                        x-show="hasAlternativesData && drug.alternatives.length === 0"
+                        x-cloak
+                        class="text-sm text-mute dark:text-[#9C9CA3]">
+                        No alternatives with the exact same ingredient set.
+                      </p>
+                
+                      <div
+                        x-show="hasAlternativesData && drug.alternatives.length > 0"
+                        x-cloak
+                        class="grid gap-2.5 overflow-y-auto thin-scroll pr-1">
+                
+                        <template
+                          x-for="group in alternativeGroups"
+                          :key="group.key">
+                
+                          <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
+                
+                            <button
+                              type="button"
+                              @click="toggleAltGroup(group.key)"
+                              class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
+                
+                              <span>
+                                <span
+                                  class="font-bold text-sm"
+                                  x-text="group.key">
+                                </span>
+                
+                                <span
+                                  class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]"
+                                  x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')">
+                                </span>
+                              </span>
+                
+                              <svg
+                                class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]"
+                                :class="openAltGroups.includes(group.key) ? 'rotate-180' : ''"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
+                
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.5"
+                                  d="M19 9l-7 7-7-7">
+                                </path>
+                              </svg>
+                            </button>
+                
+                            <div
+                              x-show="openAltGroups.includes(group.key)"
+                              x-cloak
+                              class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
+                
+                              <template
+                                x-for="alt in group.items"
+                                :key="alt.trade_name + (alt.manufacturer || '')">
+                
+                                <button
+                                  type="button"
+                                  @click="
+                                    tradeQuery = alt.trade_name;
+                                    searchTrade();
+                                  "
+                                  class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                
+                                  <span
+                                    class="font-semibold text-sm"
+                                    x-text="alt.trade_name">
+                                  </span>
+                
+                                  <p
+                                    class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]"
+                                    x-text="alt.manufacturer || 'Unknown manufacturer'">
+                                  </p>
+                                </button>
+                              </template>
+                            </div>
                           </div>
-                        </div>
-                      </template>
+                        </template>
+                      </div>
                     </div>
-                  </div>
-                </aside>
+                  </aside>
+                
+                </div>
 
-              </div>
-            </template>
-          </div>
-        </template>
 
         <!-- ========== ACTIVE INGREDIENT SEARCH ========== -->
         <template x-if="mode === 'ingredient'">
@@ -810,7 +888,7 @@
 
                     <!-- ===== DDI ===== -->
                     <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden">
-                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-[#141416]">
+                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100/20 dark:bg-[#141416]">
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="(ing.interactions || []).length + ' pairs'"></span>
                       </div>
@@ -851,7 +929,7 @@
                     <div x-show="ing.used_in.length > 0" class="grid gap-2.5 overflow-y-auto thin-scroll pr-1">
                       <template x-for="trade in ing.used_in" :key="trade.trade_name">
                         <button type="button" @click="goToTrade(trade.trade_name)"
-                                class="w-full text-left border border-hair dark:border-dhair rounded-2xl p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                                class="w-full text-left border border-hair dark:border-dhair rounded-2xl p-4 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
                           <span class="font-bold text-sm" x-text="trade.trade_name"></span>
                           <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="trade.manufacturer"></p>
                         </button>
@@ -1182,15 +1260,89 @@
         },
 
         // ---- Alternatives, grouped by generic name ----
-        openAltGroups: [],
-        toggleAltGroup(key) {
-          const i = this.openAltGroups.indexOf(key);
-          if (i === -1) this.openAltGroups.push(key); else this.openAltGroups.splice(i, 1);
-        },
-        get alternativeGroups() {
-          if (!this.hasAlternativesData) return [];
-          return this.groupByGeneric(this.drug.alternatives, this.drug.alternatives.length);
-        },
+        document.addEventListener('alpine:init', () => {
+          Alpine.data('drugPage', () => ({
+        
+            drug: {
+              alternatives: [],
+              active_ingredients: []
+            },
+        
+            hasAlternativesData: false,
+            hasIngredientData: false,
+        
+            openAltGroups: [],
+            tradeQuery: '',
+        
+            toggleAltGroup(key) {
+              const index = this.openAltGroups.indexOf(key);
+        
+              if (index === -1) {
+                this.openAltGroups.push(key);
+              } else {
+                this.openAltGroups.splice(index, 1);
+              }
+            },
+        
+            get alternativeGroups() {
+              const alternatives = this.drug?.alternatives || [];
+        
+              if (!this.hasAlternativesData || alternatives.length === 0) {
+                return [];
+              }
+        
+              return this.groupByGeneric(alternatives);
+            },
+        
+            groupByGeneric(alternatives) {
+              const groups = {};
+        
+              alternatives.forEach(alt => {
+                const genericName =
+                  alt.generic_name ||
+                  alt.genericName ||
+                  alt.generic ||
+                  alt.active_ingredient ||
+                  'Other';
+        
+                if (!groups[genericName]) {
+                  groups[genericName] = [];
+                }
+        
+                groups[genericName].push(alt);
+              });
+        
+              return Object.entries(groups).map(([key, items]) => ({
+                key,
+                items
+              }));
+            },
+        
+            get allInteractions() {
+              const ingredients = this.drug?.active_ingredients || [];
+        
+              if (!this.hasIngredientData || ingredients.length === 0) {
+                return [];
+              }
+        
+              return ingredients.flatMap(ingredient =>
+                (ingredient.interactions || []).map(interaction => ({
+                  ingredient:
+                    ingredient.display_name ||
+                    ingredient.name ||
+                    '',
+                  ...interaction
+                }))
+              );
+            },
+        
+            searchTrade() {
+              // Use your existing search function here.
+              console.log('Searching for:', this.tradeQuery);
+            }
+        
+          }));
+        });
 
         // Flatten DDI rows from every ingredient
         get allInteractions() {
