@@ -1439,19 +1439,59 @@
         // ---- Interactive 3D receptor viewer (3Dmol.js) ----
         renderReceptor(el, pdbId) {
           if (typeof $3Dmol === 'undefined' || !pdbId) return;
+        
           el.innerHTML = '';
+        
           const dark = document.documentElement.classList.contains('dark');
-          const viewer = $3Dmol.createViewer(el, { backgroundColor: dark ? '#1C1C1E' : '#FAFAFA' });
+        
+          const viewer = $3Dmol.createViewer(el, {
+            backgroundColor: dark ? '#1C1C1E' : '#FAFAFA'
+          });
+        
           $3Dmol.download('pdb:' + pdbId, viewer, {}, () => {
-            // Ball-and-stick: every atom as a sphere, every bond as a stick
-            viewer.setStyle({}, {
-              sphere: { scale: 0.28, colorscheme: 'Jmol' },
-              stick:  { radius: 0.14, colorscheme: 'Jmol' }
-            });
+            const model = viewer.getModel();
+        
+            // Remove water molecules from the structure
+            const waterAtoms = model
+              .selectedAtoms({ hetflag: true })
+              .filter(atom =>
+                /^(HOH|WAT|H2O|DOD)$/i.test(atom.resn || '')
+              );
+        
+            model.removeAtoms(waterAtoms);
+        
+            // Protein/receptor: cartoon representation
+            viewer.setStyle(
+              { hetflag: false },
+              {
+                cartoon: {
+                  color: 'spectrum',
+                  opacity: 0.9
+                }
+              }
+            );
+        
+            // Ligands and other non-water hetero atoms:
+            // colored differently with visible bonds and aromatic rings
+            viewer.setStyle(
+              { hetflag: true },
+              {
+                stick: {
+                  radius: 0.18,
+                  color: '#FF3B30'
+                },
+                sphere: {
+                  scale: 0.25,
+                  color: '#FF3B30'
+                }
+              }
+            );
+        
             viewer.zoomTo();
             viewer.render();
           });
         },
+
 
         async searchIngredient() {
           const q = this.ingQuery.trim();
