@@ -122,28 +122,30 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="relative overflow-hidden border-b border-hair dark:border-dhair">
-    <!-- Backdrop: faint scientific dot-grid, faded toward the edges -->
+    <!-- Backdrop: faint scientific dot-grid, faded toward the edges — fills space with intent -->
     <div aria-hidden="true" class="pointer-events-none absolute inset-0
                   dark:[background-image:radial-gradient(circle_at_1px_1px,rgba(250,250,250,0.05)_1px,transparent_0)]
                   [background-image:radial-gradient(circle_at_1px_1px,rgba(10,10,10,0.055)_1px,transparent_0)]
                   [background-size:28px_28px]
                   [mask-image:radial-gradient(ellipse_80%_75%_at_50%_35%,black,transparent)]
                   dark:[mask-image:radial-gradient(ellipse_80%_75%_at_50%_35%,black,transparent)]"></div>
+    <!-- Faint horizon hairline behind the headline -->
     <div aria-hidden="true" class="pointer-events-none absolute left-0 right-0 top-[38%] h-px bg-hair dark:bg-dhair opacity-60"></div>
 
     <div class="relative max-w-7xl mx-auto px-6 lg:px-10 py-14 sm:py-16 lg:py-20 grid md:grid-cols-12 gap-10 lg:gap-14 items-center">
 
       <!-- ===== Copy column ===== -->
       <div class="md:col-span-5 fade-up">
-        <div class="flex items-center gap-1 mb-7">
-          <span class="w-3 h-px bg-ink dark:bg-snow"></span>
-       		 <p class="mt-9 font-mono text-[11px] uppercase tracking-[0.22em] text-faint dark:text-[#6E6E76]">
-          	PubChem · ChEMBL · DrugCentral · RCSB PDB
-		</p>
+        <div class="flex items-center gap-3 mb-7">
+          <span class="w-2 h-px bg-ink dark:bg-snow"></span>       
+	 <p class="mt-9 font-mono text-[11px] uppercase tracking-[0.22em] text-faint dark:text-[#6E6E76]">
+          PubChem · ChEMBL · DrugCentral · RCSB PDB
+        </p>
         </div>
 
         <h1 class="text-5xl sm:text-6xl lg:text-[4.35rem] font-extrabold leading-[1.02] tracking-tightest">
-          Deepen your knowlage in the drug
+          Every drug,<br/>down to the<br/>
+          <span class="text-mute dark:text-[#9C9CA3]">last atom.</span>
         </h1>
 
         <p class="mt-6 text-[15px] text-mute dark:text-[#9C9CA3] leading-relaxed max-w-sm">
@@ -161,7 +163,7 @@
           </a>
         </div>
 
-        <!-- Provenance strip -->
+        <!-- Provenance strip — replaces dead whitespace with quiet evidence -->
       </div>
 
       <!-- ===== Figure column ===== -->
@@ -170,6 +172,7 @@
           <div class="img-frame relative bg-ink dark:bg-[#141416] aspect-[16/10] w-full">
             <img src="assets/hero-molecule.png" alt="Ball-and-stick molecular model"
                  class="w-full h-full object-cover object-center" />
+            <!-- corner registration marks -->
             <span aria-hidden="true" class="absolute top-3 left-3 w-3 h-3 border-t border-l border-paper/40 dark:border-snow/30"></span>
             <span aria-hidden="true" class="absolute top-3 right-3 w-3 h-3 border-t border-r border-paper/40 dark:border-snow/30"></span>
             <span aria-hidden="true" class="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-paper/40 dark:border-snow/30"></span>
@@ -278,9 +281,10 @@
         <!-- image card -->
         <div class="md:col-span-5 bg-paper dark:bg-coal relative min-h-[420px] overflow-hidden group">
           <img src="assets/microscope.jpg" alt="Researcher at a microscope" class="absolute inset-0 w-full h-full object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.03]" loading="lazy" />
-       <div class="absolute inset-x-4 bottom-4 bg-paper/90 dark:bg-coal/90 backdrop-blur-xl border border-hair dark:border-dhair rounded-2xl p-5">
-            <h3 class="text-base font-bold">Pharmacology Data</h3>
-            <p class="mt-1 text-[13px] text-mute dark:text-[#9C9CA3] leading-relaxed">Full pharmacological profiles for every active ingredient — indication, half-life, pharmacodynamics.</p>
+       <div class="absolute bottom-4 left-4 right-4 bg-gradient-to-t from-paper dark:from-black via-black/70 dark:via-black/50 to-transparent p-7 pt-70
+                      bg-paper/85 dark:bg-coal/85 backdrop-blur-xl rounded-2xl p-6 dark:border-dhair">
+            <h3 class="text-lg font-bold">Pharmacology Data</h3>
+            <p class="mt-1.5 text-sm text-snow dark:text-[#9C9CA3] leading-relaxed">Full pharmacological profiles for every active ingredient — indication, half-life, pharmacodynamics.</p>
           </div>
         </div>   
         <div class="md:col-span-7 bg-paper dark:bg-coal p-8 sm:p-10 flex flex-col justify-between">
@@ -305,9 +309,10 @@
         </div>
         <div class="md:col-span-12 bg-paper dark:bg-coal relative min-h-[300px] overflow-hidden group">
           <img src="assets/lab-vintage.jpg" alt="Vintage pharmaceutical laboratory" class="absolute inset-0 w-full h-full object-cover object-center opacity-90 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.02]" loading="lazy" />
-       <div class="absolute inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-6 sm:left-6 sm:max-w-md bg-paper/90 dark:bg-coal/90 backdrop-blur-xl border border-hair dark:border-dhair rounded-2xl p-6">
-            <h3 class="text-xl font-bold tracking-tight">Structural Evidence</h3>
-            <p class="mt-2 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">Every claim is anchored to a structure — receptor PDBs from RCSB, ligands validated by crystallographic metrics.</p>
+       <div class="absolute top-4 left-4 right-4 bg-gradient-to-t from-paper dark:from-black via-paper/70 dark:via-coal/70 to-transparent p-7 pt-70
+                      bg-paper/85 dark:bg-coal/85 backdrop-blur-xl rounded-2xl p-6 dark:border-dhair">
+            <h3 class="text-2xl font-bold tracking-tight">Structural Evidence</h3>
+            <p class="mt-2 text-sm text-mute dark:text-[#C7C7CE] leading-relaxed">Every claim is anchored to a structure — receptor PDBs from RCSB, ligands validated by crystallographic metrics.</p>
           </div>
         </div>
       </div>
@@ -335,7 +340,7 @@
         </div>
         <div class="grid sm:grid-cols-2 gap-px bg-hair dark:bg-dhair border border-hair dark:border-dhair rounded-3xl overflow-hidden max-w-4xl mx-auto">
           <button type="button" @click="chooseMode('trade')"
-                  class="group text-left bg-paper dark:bg-coal p-10 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                  class="group text-left bg-paper dark:bg-coal p-10 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
             <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Path A</span>
             <h3 class="mt-4 text-2xl font-bold tracking-tight">Trade Name</h3>
             <p class="mt-3 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">You know the product on the shelf. Find its manufacturer, drug class and full ingredient breakdown.</p>
@@ -344,7 +349,7 @@
             </span>
           </button>
           <button type="button" @click="chooseMode('ingredient')"
-                  class="group text-left bg-paper dark:bg-coal p-10 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                  class="group text-left bg-paper dark:bg-coal p-10 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
             <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Path B</span>
             <h3 class="mt-4 text-2xl font-bold tracking-tight">Active Ingredient</h3>
             <p class="mt-3 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">You know the compound. Go straight to its pharmacology, mechanism of action and structural evidence.</p>
@@ -371,8 +376,9 @@
 
               <form @submit.prevent="tradeSuggestOpen = false; searchTrade()" class="max-w-xl mx-auto mt-9 relative" @click.outside="tradeSuggestOpen = false">
                 <input type="text" x-model="tradeQuery" autocomplete="off"
-                  @input="onTradeType()"
-                  @focus="tradeSuggestOpen = tradeSuggestions.length > 0"
+                  @input.debounce.150ms="onTradeType()"
+                  @focus="if (tradeSuggestions.length) tradeSuggestOpen = true"
+                  @blur="setTimeout(() => tradeSuggestOpen = false, 120)"
                   @keydown.escape="tradeSuggestOpen = false"
                   placeholder="Type a trade name… (e.g., Augmentin)"
                   class="w-full px-6 py-4 pr-24 bg-transparent border border-hair dark:border-dhair rounded-full text-[15px]
@@ -392,41 +398,35 @@
                      floating above the content behind it; opens immediately with a loading
                      row so typing never feels unresponsive. -->
                 <div x-show="tradeSuggestOpen" x-cloak x-transition
-                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-30 rounded-2xl overflow-hidden text-left bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)]">
-                  <div class="px-5 py-2.5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-50 dark:bg-white/[0.04]">
-                    <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-faint dark:text-[#6E6E76]">Quick matches</span>
-                    <span class="font-mono text-[10px] text-faint dark:text-[#6E6E76]" x-text="tradeSuggestions.length + ' / 5'"></span>
-                  </div>
-                  <div x-show="tradeSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
-                    <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                    </svg>
-                    <span class="text-[13px]">Searching…</span>
-                  </div>
-                  <div x-show="!tradeSuggestLoading">
-                    <p x-show="tradeSuggestions.length === 0" class="px-5 py-4 text-[13px] text-mute dark:text-[#9C9CA3]">No quick matches — press Enter to search the full database.</p>
-                    <template x-for="(g, i) in tradeSuggestions" :key="g.key + i">
-                      <button type="button" @click="pickTradeSuggestion(g)"
-                              class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
-                        <span class="min-w-0">
-                          <span class="text-sm font-semibold block truncate" x-text="g.key"></span>
-                          <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3] truncate" x-text="g.items[0].manufacturer || '—'"></span>
-                        </span>
-                        <span x-show="g.items.length > 1" class="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="g.items.length + ' variants'"></span>
-                      </button>
-                    </template>
-                  </div>
-                  <div class="px-5 py-2 border-t border-hair dark:border-dhair bg-zinc-50 dark:bg-white/[0.04]">
-                    <span class="font-mono text-[10px] text-faint dark:text-[#6E6E76]">↵ full search · Esc close</span>
-                  </div>
+                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
+                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
+                    <div x-show="tradeSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
+                      <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                      </svg>
+                      <span class="text-[13px]">Searching…</span>
+                    </div>
+                    <div x-show="!tradeSuggestLoading">
+                      <template x-for="(g, i) in tradeSuggestions" :key="g.key + i">
+                        <button type="button" @click="pickTradeSuggestion(g)"
+                                class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                          <span>
+                            <span class="text-sm font-semibold" x-text="g.key"></span>
+                            <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="g.items[0].manufacturer"></span>
+                          </span>
+                          <span x-show="g.items.length > 1" class="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="g.items.length + ' variants'"></span>
+                        </button>
+                      </template>
+                    </div>
                 </div>
               </form>
 
               <div class="mt-5 text-[13px] text-mute dark:text-[#9C9CA3]">
                 Try:
                 <template x-for="ex in ['Augmentin','Panadol','Abimol','Cataflam']" :key="ex">
-                  <button type="button" @click="tradeQuery = ex; tradeSuggestOpen = false; searchTrade()" class="text-ink dark:text-snow underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow mx-1 transition-colors" x-text="ex"></button>
+                  <button type="button" @click="tradeQuery = ex; searchTrade()" class="text-ink dark:text-snow underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow mx-1 transition-colors" x-text="ex"></button>
                 </template>
               </div>
             </div>
@@ -459,7 +459,7 @@
                 <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">
                   <span x-text="tradeResults.length"></span> matches — choose one
                 </p>
-                <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-faint dark:text-[#6E6E76]" x-text="'“' + tradeQuery + '”'"></span>
+                <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-faint dark:text-[#6E6E76]" x-text="'&quot;' + tradeQuery + '&quot;'"></span>
               </div>
               <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-hair dark:bg-dhair border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                 <template x-for="r in tradeResults" :key="r.trade_name">
@@ -483,7 +483,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
-                <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
+                <article x-ref="tradeMain" class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <div class="flex items-start justify-between gap-4">
                       <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="drug.trade_name"></h4>
@@ -574,34 +574,25 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — alternatives: fixed-size grouped card with its own filter + internal scroll -->
+                <!-- SIDEBAR — alternatives (grouped by generic name, expandable by route/form).
+                     A normal card like any other on the page, just capped to the main
+                     article's measured height so it never grows taller than it; the group
+                     list scrolls inside it once it runs out of room. -->
                 <aside class="lg:col-span-3">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[420px] sm:h-[520px] lg:h-[600px] flex flex-col">
-                    <div class="flex items-center justify-between gap-3 mb-4 shrink-0">
-                      <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Alternative Drugs</h5>
-                      <span x-show="hasAlternativesData" class="font-mono text-[10px] px-2 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="drug.alternatives.length"></span>
-                    </div>
-
-                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" class="relative mb-4 shrink-0">
-                      <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-faint dark:text-[#6E6E76]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="1.5"/><path stroke-linecap="round" d="m20 20-3.5-3.5" stroke-width="1.5"/></svg>
-                      <input type="text" x-model="altFilter" placeholder="Filter alternatives…"
-                             class="w-full pl-9 pr-3 py-2.5 bg-transparent border border-hair dark:border-dhair rounded-full text-[13px]
-                                    placeholder:text-faint dark:placeholder:text-[#6E6E76] focus:outline-none focus:border-ink dark:focus:border-snow transition-colors"/>
-                    </div>
-
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col"
+                       style="height: 420px; max-height: 420px;">
+                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">Alternative Drugs</h5>
                     <p x-show="!hasAlternativesData" class="text-sm text-mute dark:text-[#9C9CA3]">Alternatives are not available from this endpoint yet.</p>
                     <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No alternatives in the database.</p>
-                    <p x-show="hasAlternativesData && drug.alternatives.length > 0 && altVisibleGroups.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">Nothing matches “<span class="font-semibold" x-text="altFilter"></span>”.</p>
-
                     <div x-show="hasAlternativesData && altVisibleGroups.length > 0"
                          class="grid gap-2.5 flex-1 min-h-0 overflow-y-auto thin-scroll pr-1 content-start">
-                      <template x-for="group in altVisibleGroups" :key="group.key">
+                      <template x-for="group in alternativeGroups" :key="group.key">
                         <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
                           <!-- group header — click to expand the routes/forms/doses under the same generic name -->
                           <button type="button" @click="toggleAltGroup(group.key)"
                                   class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                            <span class="min-w-0">
-                              <span class="font-bold text-sm block truncate" x-text="group.key"></span>
+                            <span>
+                              <span class="font-bold text-sm" x-text="group.key"></span>
                               <span class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')"></span>
                             </span>
                             <svg class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]" :class="openAltGroups.includes(group.key) ? 'rotate-180' : ''"
@@ -609,11 +600,11 @@
                           </button>
                           <!-- expanded: every route / dosage form / strength under this generic name -->
                           <div x-show="openAltGroups.includes(group.key)" x-cloak class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
-                            <template x-for="alt in group.items" :key="(alt.trade_name || alt.generic_name || group.key) + (alt.route || '') + (alt.dosage_form || '') + (alt.strength || '')">
-                              <button type="button" @click="tradeQuery = alt.trade_name || alt.generic_name || group.key; tradeSuggestOpen = false; searchTrade()"
+                            <template x-for="alt in group.items" :key="alt.trade_name + (alt.route || '') + (alt.dosage_form || '') + (alt.strength || '')">
+                              <button type="button" @click="tradeQuery = alt.trade_name; searchTrade()"
                                       class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                                <span class="font-semibold text-sm" x-text="alt.trade_name || alt.generic_name || 'Unnamed product'"></span>
-                                <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="alt.manufacturer || '—'"></p>
+                                <span class="font-semibold text-sm" x-text="alt.trade_name"></span>
+                                <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="alt.manufacturer"></p>
                                 <div x-show="alt.route || alt.dosage_form || alt.strength" class="mt-2 flex flex-wrap gap-1.5">
                                   <span x-show="alt.dosage_form" class="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="alt.dosage_form"></span>
                                   <span x-show="alt.route" class="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="alt.route"></span>
@@ -642,8 +633,9 @@
 
               <form @submit.prevent="ingSuggestOpen = false; searchIngredient()" class="max-w-xl mx-auto mt-9 relative" @click.outside="ingSuggestOpen = false">
                 <input type="text" x-model="ingQuery" autocomplete="off"
-                  @input="onIngType()"
-                  @focus="ingSuggestOpen = ingSuggestions.length > 0"
+                  @input.debounce.150ms="onIngType()"
+                  @focus="if (ingSuggestions.length) ingSuggestOpen = true"
+                  @blur="setTimeout(() => ingSuggestOpen = false, 120)"
                   @keydown.escape="ingSuggestOpen = false"
                   placeholder="Type an active ingredient… (e.g., Morphine)"
                   class="w-full px-6 py-4 pr-24 bg-transparent border border-hair dark:border-dhair rounded-full text-[15px]
@@ -660,11 +652,9 @@
 
                 <!-- live suggestions — top 5, updates as the user types -->
                 <div x-show="ingSuggestOpen" x-cloak x-transition
-                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-30 rounded-2xl overflow-hidden text-left bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)]">
-                  <div class="px-5 py-2.5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-50 dark:bg-white/[0.04]">
-                    <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-faint dark:text-[#6E6E76]">Quick matches</span>
-                    <span class="font-mono text-[10px] text-faint dark:text-[#6E6E76]" x-text="ingSuggestions.length + ' / 5'"></span>
-                  </div>
+                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
+                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                   <div x-show="ingSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                     <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -673,17 +663,13 @@
                     <span class="text-[13px]">Searching…</span>
                   </div>
                   <div x-show="!ingSuggestLoading">
-                    <p x-show="ingSuggestions.length === 0" class="px-5 py-4 text-[13px] text-mute dark:text-[#9C9CA3]">No quick matches — press Enter to search the full database.</p>
                     <template x-for="(s, i) in ingSuggestions" :key="(s.display_name || s) + i">
                       <button type="button" @click="pickIngSuggestion(s)"
                               class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
-                        <span class="text-sm font-semibold truncate" x-text="s.display_name || s"></span>
-                        <span x-show="s.molecular_formula" class="shrink-0 font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="s.molecular_formula"></span>
+                        <span class="text-sm font-semibold" x-text="s.display_name || s"></span>
+                        <span x-show="s.molecular_formula" class="font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="s.molecular_formula"></span>
                       </button>
                     </template>
-                  </div>
-                  <div class="px-5 py-2 border-t border-hair dark:border-dhair bg-zinc-50 dark:bg-white/[0.04]">
-                    <span class="font-mono text-[10px] text-faint dark:text-[#6E6E76]">↵ full search · Esc close</span>
                   </div>
                 </div>
               </form>
@@ -691,7 +677,7 @@
               <div class="mt-5 text-[13px] text-mute dark:text-[#9C9CA3]">
                 Try:
                 <template x-for="ex in ['Morphine','Paracetamol','Amoxicillin','Caffeine']" :key="ex">
-                  <button type="button" @click="ingQuery = ex; ingSuggestOpen = false; searchIngredient()" class="text-ink dark:text-snow underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow mx-1 transition-colors" x-text="ex"></button>
+                  <button type="button" @click="ingQuery = ex; searchIngredient()" class="text-ink dark:text-snow underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow mx-1 transition-colors" x-text="ex"></button>
                 </template>
               </div>
             </div>
@@ -721,7 +707,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
-                <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
+                <article x-ref="ingMain" class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="ing.display_name"></h4>
                     <p x-show="ing.molecular_formula" class="mt-2 font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.molecular_formula"></p>
@@ -848,61 +834,30 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — used in: fixed-size grouped card with filter + internal scroll -->
+                <!-- SIDEBAR — used in. A normal card capped to the article's measured
+                     height; the list scrolls inside it once it runs out of room. -->
                 <aside class="lg:col-span-3">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[420px] sm:h-[520px] lg:h-[600px] flex flex-col">
-                    <div class="flex items-center justify-between gap-3 mb-4 shrink-0">
-                      <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Used in Trade Names</h5>
-                      <span class="font-mono text-[10px] px-2 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="ing.used_in.length"></span>
-                    </div>
-
-                    <div x-show="ing.used_in.length > 0" class="relative mb-4 shrink-0">
-                      <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-faint dark:text-[#6E6E76]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="1.5"/><path stroke-linecap="round" d="m20 20-3.5-3.5" stroke-width="1.5"/></svg>
-                      <input type="text" x-model="usedInFilter" placeholder="Filter products…"
-                             class="w-full pl-9 pr-3 py-2.5 bg-transparent border border-hair dark:border-dhair rounded-full text-[13px]
-                                    placeholder:text-faint dark:placeholder:text-[#6E6E76] focus:outline-none focus:border-ink dark:focus:border-snow transition-colors"/>
-                    </div>
-
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col"
+                       style="height: 420px; max-height: 420px;">
+                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
+                      Used in Trade Names <span x-text="'(' + ing.used_in.length + ')'"></span>
+                    </h5>
                     <p x-show="ing.used_in.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No registered products found.</p>
-                    <p x-show="ing.used_in.length > 0 && usedInVisibleGroups.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">Nothing matches “<span class="font-semibold" x-text="usedInFilter"></span>”.</p>
-
                     <div x-show="usedInVisibleGroups.length > 0"
                          class="grid gap-2.5 flex-1 min-h-0 overflow-y-auto thin-scroll pr-1 content-start">
-                      <template x-for="group in usedInVisibleGroups" :key="group.key">
-                        <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
-                          <!-- group header — click to expand every form/strength sold under this trade name -->
-                          <button type="button" @click="toggleUsedInGroup(group.key)"
-                                  class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                            <span class="min-w-0">
-                              <span class="font-bold text-sm block truncate" x-text="group.key"></span>
-                              <span class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')"></span>
-                            </span>
-                            <svg class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]" :class="openUsedInGroups.includes(group.key) ? 'rotate-180' : ''"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/></svg>
-                          </button>
-                          <!-- expanded: every variant registered under this trade name -->
-                          <div x-show="openUsedInGroups.includes(group.key)" x-cloak class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
-                            <template x-for="trade in group.items" :key="(trade.trade_name || trade.generic_name || group.key) + (trade.manufacturer || '') + (trade.route || '') + (trade.dosage_form || '') + (trade.strength || '')">
-                              <button type="button" @click="goToTrade(trade.trade_name || group.key)"
-                                      class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                                <span class="font-semibold text-sm" x-text="trade.trade_name || 'Unnamed product'"></span>
-                                <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="trade.manufacturer || '—'"></p>
-                                <div x-show="trade.route || trade.dosage_form || trade.strength" class="mt-2 flex flex-wrap gap-1.5">
-                                  <span x-show="trade.dosage_form" class="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="trade.dosage_form"></span>
-                                  <span x-show="trade.route" class="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="trade.route"></span>
-                                  <span x-show="trade.strength" class="font-mono text-[10px] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="trade.strength"></span>
-                                </div>
-                              </button>
-                            </template>
-                          </div>
-                        </div>
+                      <template x-for="trade in ing.used_in" :key="trade.trade_name">
+                        <button type="button" @click="goToTrade(trade.trade_name)"
+                                class="w-full text-left border border-hair dark:border-dhair rounded-2xl p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                          <span class="font-bold text-sm" x-text="trade.trade_name"></span>
+                          <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="trade.manufacturer"></p>
+                        </button>
                       </template>
                     </div>
                   </div>
+
                 </aside>
 
-                <!-- ===== RECEPTOR STRUCTURES — full-width row, viewer left / text right: still the
-                     main content of the card (not a side thumbnail), just arranged side by side ===== -->
+                <!-- ===== RECEPTOR STRUCTURES — full-width, one per row: the 3D view is the main content, not a side thumbnail ===== -->
                 <div x-show="ing.pdb_structures && ing.pdb_structures.length > 0" class="lg:col-span-10">
                   <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
                     <div>
@@ -915,44 +870,44 @@
                   <div class="grid grid-cols-1 gap-10">
                     <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
                       <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-[#141416]">
-                        <div class="grid grid-cols-1 lg:grid-cols-5">
-                          <!-- interactive 3Dmol viewer — left, the dominant element of the card -->
-                          <div class="lg:col-span-3 relative h-[420px] sm:h-[500px] lg:h-[600px] overflow-hidden bg-zinc-50 dark:bg-coal border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
-                               x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
-                            <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
-                              Drag to rotate · scroll to zoom
-                            </span>
+                        <!-- interactive 3Dmol viewer — full-width and tall: this is the
+                             main content of the card, not a thumbnail beside the specs -->
+                        <div class="relative h-[420px] sm:h-[560px] lg:h-[640px] w-full overflow-hidden bg-zinc-50 dark:bg-coal border-b border-hair dark:border-dhair"
+                             x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
+                          <span class="pointer-events-none absolute top-4 left-4 font-mono text-sm font-bold tracking-tight bg-paper/85 dark:bg-coal/85 backdrop-blur px-3 py-1.5 rounded-full" x-text="pdb.pdb_id"></span>
+                          <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
+                            Drag to rotate · scroll to zoom
+                          </span>
+                        </div>
+                        <!-- metadata strip -->
+                        <div class="p-7 sm:p-9 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-7">
+                          <div class="shrink-0">
+                            <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3]">Source: RCSB PDB</p>
+                            <h5 class="mt-1 text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
                           </div>
-                          <!-- metadata — right -->
-                          <div class="lg:col-span-2 p-7 sm:p-9 flex flex-col justify-between gap-8">
-                            <div>
-                              <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3]">Source: RCSB PDB</p>
-                              <h5 class="mt-1 text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
-                              <dl class="mt-6 space-y-3 text-sm">
-                                <div x-show="pdb.experiment_method" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
-                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Method</dt>
-                                  <dd class="font-semibold text-right" x-text="pdb.experiment_method"></dd>
-                                </div>
-                                <div x-show="pdb.resolution" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
-                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Resolution</dt>
-                                  <dd class="font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
-                                </div>
-                                <div class="flex justify-between">
-                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Ligands extracted</dt>
-                                  <dd>
-                                    <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
-                                       class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
-                                    <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
-                                  </dd>
-                                </div>
-                              </dl>
+                          <dl class="flex flex-wrap gap-x-10 gap-y-4 text-sm">
+                            <div x-show="pdb.experiment_method">
+                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Method</dt>
+                              <dd class="mt-1.5 font-semibold" x-text="pdb.experiment_method"></dd>
                             </div>
-                            <a :href="pdb.download_url" target="_blank"
-                               class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-[13px] font-semibold
-                                      bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
-                              Download receptor (.pdb)
-                            </a>
-                          </div>
+                            <div x-show="pdb.resolution">
+                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Resolution</dt>
+                              <dd class="mt-1.5 font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
+                            </div>
+                            <div>
+                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Ligands extracted</dt>
+                              <dd class="mt-1.5">
+                                <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
+                                   class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
+                                <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
+                              </dd>
+                            </div>
+                          </dl>
+                          <a :href="pdb.download_url" target="_blank"
+                             class="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[13px] font-semibold
+                                    bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
+                            Download receptor (.pdb)
+                          </a>
                         </div>
                       </div>
                     </template>
@@ -1054,37 +1009,18 @@
           return order.slice(0, limit).map(k => groups[k]);
         },
 
-        // ---- "Used in Trade Names" list — grouped/expandable the same way as
-        // Alternative Drugs: entries sharing a trade name collapse into one card,
-        // expanding to reveal each registered form/strength. ----
-        openUsedInGroups: [],
-        usedInFilter: '',
-        toggleUsedInGroup(key) {
-          const i = this.openUsedInGroups.indexOf(key);
-          if (i === -1) this.openUsedInGroups.push(key); else this.openUsedInGroups.splice(i, 1);
-        },
-        get usedInGroups() {
-          if (!this.ing || !Array.isArray(this.ing.used_in)) return [];
-          const order = [];
-          const groups = {};
-          for (const item of this.ing.used_in) {
-            // Robust key: trade_name first, then generic_name, then first word —
-            // rows missing every name field collapse into one visible group
-            // instead of a wall of anonymous empty rows.
-            const raw = item.trade_name || item.generic_name || '';
-            const key = raw.trim() || 'Unnamed product';
-            if (!groups[key]) { groups[key] = { key, items: [] }; order.push(key); }
-            groups[key].items.push(item);
-          }
-          return order.map(k => groups[k]);
-        },
-        get usedInVisibleGroups() {
-          const f = (this.usedInFilter || '').trim().toLowerCase();
-          if (!f) return this.usedInGroups;
-          return this.usedInGroups.filter(g =>
-            g.key.toLowerCase().includes(f) ||
-            g.items.some(it => (it.manufacturer || '').toLowerCase().includes(f))
-          );
+        // ---- Sidebar height sync: caps each sidebar card at the height of its
+        // main-content sibling, so it never grows taller than the left column;
+        // the sidebar's own list scrolls internally for anything that overflows. ----
+        tradeSidebarH: null,
+        ingSidebarH: null,
+        observeHeight(el, cb) {
+          if (!el || typeof ResizeObserver === 'undefined') return;
+          const ro = new ResizeObserver(entries => {
+            for (const entry of entries) cb(Math.round(entry.contentRect.height));
+          });
+          ro.observe(el);
+          cb(el.offsetHeight);
         },
 
         // ---- Live search suggestions (max 5 groups, as the user types) ----
@@ -1100,21 +1036,15 @@
         ingSuggestAbort: null,
 
         onTradeType() {
-          clearTimeout(this.tradeSuggestTimer);
           const q = this.tradeQuery.trim();
           if (!q) {
             this.tradeSuggestions = [];
             this.tradeSuggestOpen = false;
-            this.tradeSuggestLoading = false;
-            if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort();
             return;
           }
-          // Open the panel with a loading row right away — typing never feels stalled
-          // while the request is in flight, even before any results come back.
           this.tradeSuggestOpen = true;
           this.tradeSuggestLoading = true;
-          // Short debounce + an abort on every fresh keystroke: a slow, stale request never blocks the next one.
-          this.tradeSuggestTimer = setTimeout(() => this.fetchTradeSuggestions(q), 80);
+          this.fetchTradeSuggestions(q);
         },
         async fetchTradeSuggestions(q) {
           if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort();
@@ -1144,18 +1074,15 @@
         },
 
         onIngType() {
-          clearTimeout(this.ingSuggestTimer);
           const q = this.ingQuery.trim();
           if (!q) {
             this.ingSuggestions = [];
             this.ingSuggestOpen = false;
-            this.ingSuggestLoading = false;
-            if (this.ingSuggestAbort) this.ingSuggestAbort.abort();
             return;
           }
           this.ingSuggestOpen = true;
           this.ingSuggestLoading = true;
-          this.ingSuggestTimer = setTimeout(() => this.fetchIngSuggestions(q), 80);
+          this.fetchIngSuggestions(q);
         },
         async fetchIngSuggestions(q) {
           // Assumes a lightweight search endpoint alongside the exact-match detail endpoint.
@@ -1187,7 +1114,6 @@
 
         // ---- Alternatives, grouped by generic name so routes/forms/strengths expand together ----
         openAltGroups: [],
-        altFilter: '',
         toggleAltGroup(key) {
           const i = this.openAltGroups.indexOf(key);
           if (i === -1) this.openAltGroups.push(key); else this.openAltGroups.splice(i, 1);
@@ -1197,12 +1123,10 @@
           return this.groupByGeneric(this.drug.alternatives, this.drug.alternatives.length);
         },
         get altVisibleGroups() {
-          const f = (this.altFilter || '').trim().toLowerCase();
-          if (!f) return this.alternativeGroups;
-          return this.alternativeGroups.filter(g =>
-            g.key.toLowerCase().includes(f) ||
-            g.items.some(it => (it.manufacturer || '').toLowerCase().includes(f))
-          );
+          return this.alternativeGroups;
+        },
+        get usedInVisibleGroups() {
+          return this.ing?.used_in || [];
         },
 
         // Flatten DDI rows from every ingredient — exactly the DrugInteraction schema:
@@ -1238,12 +1162,6 @@
             this.tradeResults = [];
           }
           if (this.tradeResults.length === 1) this.drug = this.tradeResults[0];
-          this.altFilter = '';
-          this.openAltGroups = [];
-          if (this.drug) {
-            const gs = this.alternativeGroups;
-            if (gs.length) this.openAltGroups.push(gs[0].key);
-          }
           this.tradeLoading = false;
         },
 
@@ -1295,10 +1213,6 @@
               throw new Error(`API returned ${res.status}`);
             } else {
               this.ing = await res.json();
-              this.usedInFilter = '';
-              this.openUsedInGroups = [];
-              const gs = this.usedInGroups;
-              if (gs.length) this.openUsedInGroups.push(gs[0].key);
             }
           } catch (err) {
             console.error('Active ingredient search failed:', err);
@@ -1312,16 +1226,12 @@
         goToIngredient(name) {
           this.mode = 'ingredient';
           this.ingQuery = name;
-          this.tradeSuggestOpen = false;
-          this.ingSuggestOpen = false;
           this.searchIngredient();
         },
 
         goToTrade(name) {
           this.mode = 'trade';
           this.tradeQuery = name;
-          this.tradeSuggestOpen = false;
-          this.ingSuggestOpen = false;
           this.searchTrade();
         },
 
