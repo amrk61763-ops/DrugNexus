@@ -1443,7 +1443,11 @@
           const dark = document.documentElement.classList.contains('dark');
           const viewer = $3Dmol.createViewer(el, { backgroundColor: dark ? '#1C1C1E' : '#FAFAFA' });
           $3Dmol.download('pdb:' + pdbId, viewer, {}, () => {
-            viewer.setStyle({}, { ball-and-stick : { color: 'spectrum' } });
+            // Ball-and-stick: every atom as a sphere, every bond as a stick
+            viewer.setStyle({}, {
+              sphere: { scale: 0.28, colorscheme: 'Jmol' },
+              stick:  { radius: 0.14, colorscheme: 'Jmol' }
+            });
             viewer.zoomTo();
             viewer.render();
           });
