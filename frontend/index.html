@@ -82,6 +82,18 @@
 
     .fade-up { animation: fadeUp .7s cubic-bezier(.2,.8,.2,1) both; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    /* --- Dark-mode background patches: guaranteed #1C1C1E in dark mode.
+       These live inside Alpine <template x-if> blocks, where the Tailwind Play CDN
+       JIT scanner often fails to generate the dark: utilities at runtime. Plain CSS
+       scoped to .dark always applies. --- */
+    .suggest-panel  { background-color: #FFFFFF; }
+    .dark .suggest-panel  { background-color: #1C1C1E; }
+    .ddi-head       { background-color: #F4F4F5; }
+    .dark .ddi-head       { background-color: #1C1C1E; }
+    .receptor-view  { background-color: #FAFAFA; }
+    .dark .receptor-view  { background-color: #1C1C1E; }
+    .ligand-card    { background-color: #FFFFFF; }
+    .dark .ligand-card    { background-color: #1C1C1E; }
   </style>
 </head>
 
@@ -397,7 +409,7 @@
                 <!-- live suggestions — fast dedicated endpoint, min 2 chars, aborts stale requests -->
                 <div x-show="tradeSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            suggest-panel border border-hair dark:border-dhair
                             shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                     <div x-show="tradeSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                       <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
@@ -478,7 +490,7 @@
                   </button>
                 </template>
               </div>
-            </div>+
+            </div>
 
             <!-- ===== DRUG DETAIL ===== -->
             <template x-if="drug && !tradeLoading">
@@ -555,7 +567,7 @@
 
                     <!-- ===== DDI PANEL ===== -->
                     <div x-show="hasIngredientData && allInteractions.length > 0" class="border border-hair dark:border-dhair rounded-3xl overflow-hidden">
-                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-[#1C1C1E]">
+                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair ddi-head">
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="allInteractions.length + ' pairs'"></span>
                       </div>
@@ -682,7 +694,7 @@
                 <!-- live suggestions — fast dedicated endpoint -->
                 <div x-show="ingSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-white dark:bg-coal border border-hair dark:border-dhair
+                            suggest-panel border border-hair dark:border-dhair
                             shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                   <div x-show="ingSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                     <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
@@ -833,7 +845,7 @@
 
                     <!-- ===== DDI ===== -->
                     <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden">
-                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-coal">
+                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair ddi-head">
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="(ing.interactions || []).length + ' pairs'"></span>
                       </div>
@@ -899,7 +911,7 @@
                       <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-coal
                                   grid grid-cols-1 lg:grid-cols-2">
                         <!-- left half: the interactive 3D view is the hero -->
-                        <div class="relative h-[380px] sm:h-[480px] lg:h-auto lg:min-h-[480px] w-full overflow-hidden bg-zinc-50 dark:bg-dhair border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
+                        <div class="relative h-[380px] sm:h-[480px] lg:h-auto lg:min-h-[480px] w-full overflow-hidden receptor-view border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
                              x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
                           <span class="pointer-events-none absolute top-4 left-4 font-mono text-sm font-bold tracking-tight bg-paper/85 dark:bg-coal/85 backdrop-blur px-3 py-1.5 rounded-full" x-text="pdb.pdb_id"></span>
                           <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#8E8E96] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
@@ -958,7 +970,7 @@
 
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
                       <template x-for="lig in allLigands" :key="lig.pdb_id + '_' + lig.ligand_file_name">
-                        <div class="border border-hair dark:border-dhair rounded-3xl p-5 flex flex-col bg-white dark:bg-dhair">
+                        <div class="border border-hair dark:border-dhair rounded-3xl p-5 flex flex-col ligand-card">
                           <div class="flex items-center justify-between gap-2 mb-3">
                             <span class="font-mono text-[11px] px-2 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="lig.pdb_id"></span>
                             <span x-show="lig.resolution" class="text-[11px] font-semibold font-mono" x-text="lig.resolution + ' Å'"></span>
@@ -1015,7 +1027,7 @@
 
                 <div x-show="listSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
+                            suggest-panel border border-hair dark:border-dhair
                             shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                   <div x-show="listSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                     <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
@@ -1104,7 +1116,7 @@
                   <div class="snap-start shrink-0 w-[320px] sm:w-[360px] border border-hair dark:border-dhair rounded-3xl overflow-hidden flex flex-col bg-paper dark:bg-coal">
 
                     <!-- column header -->
-                    <div class="p-6 border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-[#1C1C1E]">
+                    <div class="p-6 border-b border-hair dark:border-dhair ddi-head">
                       <div class="flex items-center justify-between gap-3">
                         <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]" x-text="'Drug ' + String(ci + 1).padStart(2, '0')"></span>
                         <span class="font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal"
@@ -1416,7 +1428,7 @@
           if (typeof $3Dmol === 'undefined' || !pdbId) return;
           el.innerHTML = '';
           const dark = document.documentElement.classList.contains('dark');
-          const viewer = $3Dmol.createViewer(el, { backgroundColor: dark ? '#141416' : '#FAFAFA' });
+          const viewer = $3Dmol.createViewer(el, { backgroundColor: dark ? '#1C1C1E' : '#FAFAFA' });
           $3Dmol.download('pdb:' + pdbId, viewer, {}, () => {
             viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
             viewer.zoomTo();
