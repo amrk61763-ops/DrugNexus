@@ -1,4 +1,4 @@
-from pathlib import Path
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,21 +22,20 @@ app.add_middleware(
 )
 
 
-# API routes must be registered before the frontend catch-all mount.
 app.include_router(trade_name.router)
 app.include_router(active_ingredient.router)
 
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+    }
 
 
-# Serve the frontend from the same FastAPI app. Using an absolute path makes
-# this work regardless of the directory from which Uvicorn/Vercel starts.
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
-app.mount(
-    "/",
-    StaticFiles(directory=str(FRONTEND_DIR), html=True),
-    name="frontend",
-)
+# Serves the frontend (index.html and friends) at "/" and any non-API path.
+# StaticFiles(html=True) serves index.html for the directory itself; API
+# routes registered above still resolve first because mounts are checked last.
+_FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+if os.path.isdir(_FRONTEND_DIR):
+    app.mount("/", StaticFiles(directory=_FRONTEND_DIR, html=True), name="frontend")

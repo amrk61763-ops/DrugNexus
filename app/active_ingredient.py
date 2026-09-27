@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-كل حاجة متعلقة بـ"تفاصيل المادة الفعالة" - endpoint واحد: هات كل تفاصيل
-مادة فعالة بكودها (pubchem_cid)، بالإضافة لكل الأسماء التجارية اللي
-بتستخدمها.
+كل حاجة متعلقة بـ"تفاصيل المادة الفعالة":
+  - /active_ingredient/search?q=   اقتراحات خفيفة أثناء الكتابة (أسماء فقط)
+  - /active_ingredient/{name}      كل التفاصيل + الأسماء التجارية + الـPDB structures
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import String, cast, func, or_, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
@@ -15,13 +15,13 @@ from .models import (
     DrugIngredient,
     Ingredient,
     IngredientDetail,
-    IngredientDrugInteraction,
     PdbLigand,
     PdbReceptor,
 )
 from .schemas.active_ingredient import (
     ActiveIngredientResponse,
     DrugInteraction,
+    IngredientSearchResult,
     LigandFile,
     ReceptorStructure,
     TradeNameUsingIngredient,
@@ -40,6 +40,72 @@ def _to_int(val):
         return int(val)
     except (TypeError, ValueError):
         return None
+
+
+# ---------------------------------------------------------------------------
+# Lightweight live-suggestion endpoint - MUST be defined before "/{display_name}"
+# ---------------------------------------------------------------------------
+@router.get("/search", response_model=list[IngredientSearchResult])
+async def search_suggest(q: str, db: AsyncSession = Depends(get_db)):
+    """اقتراحات خفيفة أثناء الكتابة - الاسم والصيغة الجزيئية فقط، عشان
+    تستجيب فورًا. بيحتاج حرفين على الأقل."""
+    q = (q or "").strip()
+    if len(q) < 2:
+        return []
+    result = await db.execute(
+        select(
+            Ingredient.pubchem_cid,
+            Ingredient.display_name,
+            IngredientDetail.molecular_formula,
+        )
+        .outerjoin(IngredientDetail, IngredientDetail.pubchem_cid == Ingredient.pubchem_cid)
+        .where(Ingredient.display_name.ilike(f"%{q}%"))
+        .order_by(Ingredient.display_name)
+        .limit(8)
+    )
+    return [
+        IngredientSearchResult(
+            display_name=row.display_name,
+            pubchem_cid=row.pubchem_cid,
+            molecular_formula=row.molecular_formula,
+        )
+        for row in result.all()
+    ]
+
+
+async def _fetch_interactions(db: AsyncSession, cids: list[str]) -> dict[str, list[DrugInteraction]]:
+    """كل التفاعلات الدوائية لقائمة cids في كويري واحد."""
+    if not cids:
+        return {}
+    result = await db.execute(
+        text(
+            """
+            SELECT pubchem_cid::text AS pubchem_cid,
+                   interaction_type,
+                   interacting_class_name,
+                   interacting_drug_name,
+                   interacting_drug_pubchem_cid::text AS interacting_drug_pubchem_cid,
+                   severity,
+                   mechanism_description
+            FROM ingredient_drug_interactions
+            WHERE pubchem_cid::text = ANY(:cids)
+            """
+        ),
+        {"cids": cids},
+    )
+    by_cid: dict[str, list[DrugInteraction]] = {}
+    for row in result.mappings().all():
+        by_cid.setdefault(row["pubchem_cid"], []).append(
+            DrugInteraction(
+                interaction_type=row["interaction_type"],
+                interacting_class_name=row["interacting_class_name"],
+                interacting_drug_name=row["interacting_drug_name"],
+                interacting_drug_pubchem_cid=row["interacting_drug_pubchem_cid"],
+                severity=row["severity"],
+                mechanism_description=row["mechanism_description"],
+            )
+        )
+    return by_cid
 
 
 @router.get("/{display_name}", response_model=ActiveIngredientResponse)
@@ -62,42 +128,6 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
     )
     details = result.scalar_one_or_none()
 
-    # 3.5. Fetch all drug-drug interactions for this active ingredient.
-    # Some imported interaction rows contain leading/trailing whitespace or
-    # store the CID with a different SQL type.  Normalize both values before
-    # comparing them.  The ingredient-name fallback also supports legacy rows
-    # whose CID was not populated correctly during import.
-    normalized_cid = str(pubchem_cid).strip().lower()
-    normalized_name = ingredient.display_name.strip().lower()
-    interaction_cid = func.lower(
-        func.trim(cast(IngredientDrugInteraction.ingredient_pubchem_cid, String))
-    )
-    interaction_name = func.lower(
-        func.trim(cast(IngredientDrugInteraction.ingredient_name, String))
-    )
-
-    result = await db.execute(
-        select(IngredientDrugInteraction)
-        .where(
-            or_(
-                interaction_cid == normalized_cid,
-                interaction_name == normalized_name,
-            )
-        )
-        .order_by(IngredientDrugInteraction.id)
-    )
-    interactions = [
-        DrugInteraction(
-            interaction_type=ddi.interaction_type,
-            interacting_class_name=ddi.interacting_class_name,
-            interacting_drug_name=ddi.interacting_drug_name,
-            interacting_drug_pubchem_cid=ddi.interacting_drug_pubchem_cid,
-            severity=ddi.severity,
-            mechanism_description=ddi.mechanism_description,
-        )
-        for ddi in result.scalars().all()
-    ]
-
     # 4. Fetch ALL drugs containing this ingredient
     result = await db.execute(
         select(Drug)
@@ -106,7 +136,14 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
     )
     all_drugs = result.scalars().all()
 
-    # 4.5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
+    # 4.5. التفاعلات الدوائية المسجلة ضد المادة دي
+    ix_by_cid = await _fetch_interactions(db, [pubchem_cid])
+
+    # 5. هات كل الـreceptors المرتبطة بالمادة الفعالة دي
+    # pubchem_cid في pdb_receptors عمود jsonb - أحيانًا رقم مفرد وأحيانًا
+    # array من أرقام. .contains() العادي بيبعت الرقم كـINTEGER من غير ما
+    # يحوّله لـjsonb (وده كان بيرمي jsonb @> integer)، فبنستخدم دالة
+    # to_jsonb() الصريحة من بوستجرس عشان نضمن الكاست الصح.
     cid_int = _to_int(pubchem_cid)
     receptors = []
     if cid_int is not None:
@@ -121,6 +158,9 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
 
     if receptors:
         receptor_pdb_ids = [r.pdb_id for r in receptors]
+
+        # استعلام واحد لكل الـligands بتوع كل الـreceptors مع بعض
+        # (بدل استعلام منفصل لكل receptor - نفس فلسفة trade_name.py)
         result = await db.execute(
             select(PdbLigand).where(PdbLigand.pdb_id.in_(receptor_pdb_ids))
         )
@@ -129,49 +169,53 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         ligands_by_pdb_id: dict[str, list[PdbLigand]] = {}
         for lig in all_ligands:
             ligands_by_pdb_id.setdefault(lig.pdb_id, []).append(lig)
-    else:
-        ligands_by_pdb_id = {}
 
-    pdb_structures = [
-        ReceptorStructure(
-            pdb_id=r.pdb_id,
-            receptor_file_name=r.receptor_file_name,
-            resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
-            experiment_method=getattr(r, "experiment_method", None),
-            download_url=getattr(r, "receptor_blob_url", None),
-            ligands=[
-                LigandFile(
-                    ligand_file_name=l.ligand_file_name,
-                    resolution=str(getattr(l, "resolution")) if getattr(l, "resolution", None) is not None else None,
-                    rsr=_to_int(getattr(l, "rsr", None)),
-                    rscc=_to_int(getattr(l, "rscc", None)),
-                    atom_count=_to_int(getattr(l, "atom_count", None)),
-                    download_url=getattr(l, "ligand_blob_url", None),
-                )
-                for l in ligands_by_pdb_id.get(r.pdb_id, [])
-            ],
-        )
-        for r in receptors
-    ]
+        pdb_structures = [
+            ReceptorStructure(
+                pdb_id=r.pdb_id,
+                receptor_file_name=r.receptor_file_name,
+                resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
+                experiment_method=getattr(r, "experiment_method", None),
+                download_url=getattr(r, "receptor_blob_url", None),
+                ligands=[
+                    LigandFile(
+                        ligand_file_name=l.ligand_file_name,
+                        resolution=str(getattr(l, "resolution")) if getattr(l, "resolution", None) is not None else None,
+                        rsr=_to_int(getattr(l, "rsr", None)),
+                        rscc=_to_int(getattr(l, "rscc", None)),
+                        atom_count=_to_int(getattr(l, "atom_count", None)),
+                        download_url=getattr(l, "ligand_blob_url", None),
+                    )
+                    for l in ligands_by_pdb_id.get(r.pdb_id, [])
+                ],
+            )
+            for r in receptors
+        ]
 
-    # 5. Process drugs to extract the base name (prefix) and remove duplicates
+    # 6. Process drugs to extract the base name (prefix) and remove duplicates
+    # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
     unique_drugs_map = {}
+
     for drug in all_drugs:
         trade_name = drug.trade_name
         if not trade_name:
             continue
 
+        # Split by space to get the first word (the base name/prefix)
         base_name = trade_name.split()[0]
+
+        # Only add if we haven't seen this base name yet
         if base_name not in unique_drugs_map:
             unique_drugs_map[base_name] = {
                 "trade_name": base_name,
-                "manufacturer": drug.manufacturer,
+                "manufacturer": drug.manufacturer
             }
 
+    # Convert the map back to a list of objects for the response
     used_in_list = [
         TradeNameUsingIngredient(
             trade_name=data["trade_name"],
-            manufacturer=data["manufacturer"],
+            manufacturer=data["manufacturer"]
         )
         for data in unique_drugs_map.values()
     ]
@@ -196,6 +240,6 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         chembl_target_name=details.chembl_target_name if details else None,
         chembl_target_type=details.chembl_target_type if details else None,
         used_in=used_in_list,
-        interactions=interactions,
+        interactions=ix_by_cid.get(pubchem_cid, []),
         pdb_structures=pdb_structures,
     )
