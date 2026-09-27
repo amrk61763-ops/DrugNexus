@@ -394,7 +394,7 @@
 
                 <!-- live suggestions — top 5, updates as the user types -->
                 <div x-show="tradeSuggestOpen && tradeSuggestions.length > 0" x-cloak x-transition
-                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 bg-paper dark:bg-coal border border-hair dark:border-dhair rounded-2xl overflow-hidden shadow-lg text-left">
+                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 bg-white dark:bg-coal border dark:border-dhair rounded-2xl overflow-hidden shadow-lg text-left">
                   <template x-for="(s, i) in tradeSuggestions" :key="s.trade_name + i">
                     <button type="button" @click="pickTradeSuggestion(s)"
                             class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
@@ -628,7 +628,7 @@
 
                 <!-- live suggestions — top 5, updates as the user types -->
                 <div x-show="ingSuggestOpen && ingSuggestions.length > 0" x-cloak x-transition
-                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 bg-paper dark:bg-coal border border-hair dark:border-dhair rounded-2xl overflow-hidden shadow-lg text-left">
+                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 bg-white dark:bg-coal border dark:border-dhair rounded-2xl overflow-hidden shadow-lg text-left">
                   <template x-for="(s, i) in ingSuggestions" :key="(s.display_name || s) + i">
                     <button type="button" @click="pickIngSuggestion(s)"
                             class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
