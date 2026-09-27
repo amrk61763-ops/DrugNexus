@@ -482,7 +482,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
-                <article x-ref="tradeMain" class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
+                <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <div class="flex items-start justify-between gap-4">
                       <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="drug.trade_name"></h4>
@@ -574,12 +574,10 @@
                 </article>
 
                 <!-- SIDEBAR — alternatives (grouped by generic name, expandable by route/form).
-                     A normal card like any other on the page, just capped to the main
-                     article's measured height so it never grows taller than it; the group
-                     list scrolls inside it once it runs out of room. -->
-                <aside class="lg:col-span-3" x-init="$nextTick(() => observeHeight($refs.tradeMain, h => tradeSidebarH = h))">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col"
-                       :style="tradeSidebarH ? ('max-height:' + tradeSidebarH + 'px') : ''">
+                     A normal card, fixed size, with its own internal scrollbar for anything
+                     that overflows it. -->
+                <aside class="lg:col-span-3">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[600px] w-full flex flex-col">
                     <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">Alternative Drugs</h5>
                     <p x-show="!hasAlternativesData" class="text-sm text-mute dark:text-[#9C9CA3]">Alternatives are not available from this endpoint yet.</p>
                     <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No alternatives in the database.</p>
@@ -704,7 +702,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
-                <article x-ref="ingMain" class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
+                <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="ing.display_name"></h4>
                     <p x-show="ing.molecular_formula" class="mt-2 font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.molecular_formula"></p>
@@ -831,29 +829,51 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — used in. A normal card capped to the article's measured
-                     height; the list scrolls inside it once it runs out of room. -->
-                <aside class="lg:col-span-3" x-init="$nextTick(() => observeHeight($refs.ingMain, h => ingSidebarH = h))">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col"
-                       :style="ingSidebarH ? ('max-height:' + ingSidebarH + 'px') : ''">
+                <!-- SIDEBAR — used in. Same fixed-size card + grouped/expandable pattern as
+                     the Alternative Drugs sidebar, with its own internal scrollbar. -->
+                <aside class="lg:col-span-3">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[600px] w-full flex flex-col">
                     <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
                       Used in Trade Names <span x-text="'(' + ing.used_in.length + ')'"></span>
                     </h5>
                     <p x-show="ing.used_in.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No registered products found.</p>
-                    <div x-show="ing.used_in.length > 0" class="grid gap-3 flex-1 min-h-0 overflow-y-auto thin-scroll pr-1 content-start">
-                      <template x-for="trade in ing.used_in" :key="trade.trade_name">
-                        <button type="button" @click="goToTrade(trade.trade_name)"
-                                class="w-full text-left border border-hair dark:border-dhair rounded-2xl p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                          <span class="font-bold text-sm" x-text="trade.trade_name"></span>
-                          <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="trade.manufacturer"></p>
-                        </button>
+                    <div x-show="ing.used_in.length > 0" class="grid gap-2.5 flex-1 min-h-0 overflow-y-auto thin-scroll pr-1 content-start">
+                      <template x-for="group in usedInGroups" :key="group.key">
+                        <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
+                          <!-- group header — click to expand every form/strength sold under this trade name -->
+                          <button type="button" @click="toggleUsedInGroup(group.key)"
+                                  class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                            <span>
+                              <span class="font-bold text-sm" x-text="group.key"></span>
+                              <span class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')"></span>
+                            </span>
+                            <svg class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]" :class="openUsedInGroups.includes(group.key) ? 'rotate-180' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/></svg>
+                          </button>
+                          <!-- expanded: every variant registered under this trade name -->
+                          <div x-show="openUsedInGroups.includes(group.key)" x-cloak class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
+                            <template x-for="trade in group.items" :key="trade.trade_name + (trade.manufacturer || '') + (trade.route || '') + (trade.dosage_form || '') + (trade.strength || '')">
+                              <button type="button" @click="goToTrade(trade.trade_name)"
+                                      class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                                <span class="font-semibold text-sm" x-text="trade.trade_name"></span>
+                                <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="trade.manufacturer"></p>
+                                <div x-show="trade.route || trade.dosage_form || trade.strength" class="mt-2 flex flex-wrap gap-1.5">
+                                  <span x-show="trade.dosage_form" class="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="trade.dosage_form"></span>
+                                  <span x-show="trade.route" class="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="trade.route"></span>
+                                  <span x-show="trade.strength" class="font-mono text-[10px] px-2 py-0.5 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="trade.strength"></span>
+                                </div>
+                              </button>
+                            </template>
+                          </div>
+                        </div>
                       </template>
                     </div>
                   </div>
 
                 </aside>
 
-                <!-- ===== RECEPTOR STRUCTURES — full-width, one per row: the 3D view is the main content, not a side thumbnail ===== -->
+                <!-- ===== RECEPTOR STRUCTURES — full-width row, viewer left / text right: still the
+                     main content of the card (not a side thumbnail), just arranged side by side ===== -->
                 <div x-show="ing.pdb_structures && ing.pdb_structures.length > 0" class="lg:col-span-10">
                   <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
                     <div>
@@ -866,44 +886,44 @@
                   <div class="grid grid-cols-1 gap-10">
                     <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
                       <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-[#141416]">
-                        <!-- interactive 3Dmol viewer — full-width and tall: this is the
-                             main content of the card, not a thumbnail beside the specs -->
-                        <div class="relative h-[420px] sm:h-[560px] lg:h-[640px] w-full overflow-hidden bg-zinc-50 dark:bg-coal border-b border-hair dark:border-dhair"
-                             x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
-                          <span class="pointer-events-none absolute top-4 left-4 font-mono text-sm font-bold tracking-tight bg-paper/85 dark:bg-coal/85 backdrop-blur px-3 py-1.5 rounded-full" x-text="pdb.pdb_id"></span>
-                          <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
-                            Drag to rotate · scroll to zoom
-                          </span>
-                        </div>
-                        <!-- metadata strip -->
-                        <div class="p-7 sm:p-9 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-7">
-                          <div class="shrink-0">
-                            <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3]">Source: RCSB PDB</p>
-                            <h5 class="mt-1 text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
+                        <div class="grid grid-cols-1 lg:grid-cols-5">
+                          <!-- interactive 3Dmol viewer — left, the dominant element of the card -->
+                          <div class="lg:col-span-3 relative h-[420px] sm:h-[500px] lg:h-[600px] overflow-hidden bg-zinc-50 dark:bg-coal border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
+                               x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
+                            <span class="pointer-events-none absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/85 dark:bg-coal/85 backdrop-blur px-2.5 py-1 rounded-full">
+                              Drag to rotate · scroll to zoom
+                            </span>
                           </div>
-                          <dl class="flex flex-wrap gap-x-10 gap-y-4 text-sm">
-                            <div x-show="pdb.experiment_method">
-                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Method</dt>
-                              <dd class="mt-1.5 font-semibold" x-text="pdb.experiment_method"></dd>
-                            </div>
-                            <div x-show="pdb.resolution">
-                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Resolution</dt>
-                              <dd class="mt-1.5 font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
-                            </div>
+                          <!-- metadata — right -->
+                          <div class="lg:col-span-2 p-7 sm:p-9 flex flex-col justify-between gap-8">
                             <div>
-                              <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em]">Ligands extracted</dt>
-                              <dd class="mt-1.5">
-                                <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
-                                   class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
-                                <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
-                              </dd>
+                              <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3]">Source: RCSB PDB</p>
+                              <h5 class="mt-1 text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
+                              <dl class="mt-6 space-y-3 text-sm">
+                                <div x-show="pdb.experiment_method" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
+                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Method</dt>
+                                  <dd class="font-semibold text-right" x-text="pdb.experiment_method"></dd>
+                                </div>
+                                <div x-show="pdb.resolution" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
+                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Resolution</dt>
+                                  <dd class="font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
+                                </div>
+                                <div class="flex justify-between">
+                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Ligands extracted</dt>
+                                  <dd>
+                                    <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
+                                       class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
+                                    <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
+                                  </dd>
+                                </div>
+                              </dl>
                             </div>
-                          </dl>
-                          <a :href="pdb.download_url" target="_blank"
-                             class="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[13px] font-semibold
-                                    bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
-                            Download receptor (.pdb)
-                          </a>
+                            <a :href="pdb.download_url" target="_blank"
+                               class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-[13px] font-semibold
+                                      bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
+                              Download receptor (.pdb)
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </template>
@@ -1005,18 +1025,24 @@
           return order.slice(0, limit).map(k => groups[k]);
         },
 
-        // ---- Sidebar height sync: caps each sidebar card at the height of its
-        // main-content sibling, so it never grows taller than the left column;
-        // the sidebar's own list scrolls internally for anything that overflows. ----
-        tradeSidebarH: null,
-        ingSidebarH: null,
-        observeHeight(el, cb) {
-          if (!el || typeof ResizeObserver === 'undefined') return;
-          const ro = new ResizeObserver(entries => {
-            for (const entry of entries) cb(Math.round(entry.contentRect.height));
-          });
-          ro.observe(el);
-          cb(el.offsetHeight);
+        // ---- "Used in Trade Names" list — grouped/expandable the same way as
+        // Alternative Drugs: entries sharing a trade name collapse into one card,
+        // expanding to reveal each registered form/strength. ----
+        openUsedInGroups: [],
+        toggleUsedInGroup(key) {
+          const i = this.openUsedInGroups.indexOf(key);
+          if (i === -1) this.openUsedInGroups.push(key); else this.openUsedInGroups.splice(i, 1);
+        },
+        get usedInGroups() {
+          if (!this.ing || !Array.isArray(this.ing.used_in)) return [];
+          const order = [];
+          const groups = {};
+          for (const item of this.ing.used_in) {
+            const key = item.trade_name || 'Unknown';
+            if (!groups[key]) { groups[key] = { key, items: [] }; order.push(key); }
+            groups[key].items.push(item);
+          }
+          return order.map(k => groups[k]);
         },
 
         // ---- Live search suggestions (max 5 groups, as the user types) ----
