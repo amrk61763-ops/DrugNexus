@@ -392,16 +392,21 @@
                   </svg>
                 </button>
 
-                <!-- live suggestions — top 5, updates as the user types -->
+                <!-- live suggestions — top 5 generic-name groups, updates as the user types -->
                 <div x-show="tradeSuggestOpen && tradeSuggestions.length > 0" x-cloak x-transition
-                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 bg-white dark:bg-coal border dark:border-dhair rounded-2xl overflow-hidden shadow-lg text-left">
-                  <template x-for="(s, i) in tradeSuggestions" :key="s.trade_name + i">
-                    <button type="button" @click="pickTradeSuggestion(s)"
-                            class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
-                      <span class="text-sm font-semibold" x-text="s.trade_name"></span>
-                      <span class="font-mono text-[11px] text-mute dark:text-[#9C9CA3] truncate" x-text="s.manufacturer"></span>
-                    </button>
-                  </template>
+                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
+                            bg-[#FAFAF9] dark:bg-[#0A0A0A] backdrop-blur-xl border border-hair dark:border-dhair
+                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.8)] ring-1 ring-black/5 dark:ring-white/10">
+                    <template x-for="(g, i) in tradeSuggestions" :key="g.key + i">
+                      <button type="button" @click="pickTradeSuggestion(g)"
+                              class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                        <span>
+                          <span class="text-sm font-semibold" x-text="g.key"></span>
+                          <span class="block font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="g.items[0].manufacturer"></span>
+                        </span>
+                        <span x-show="g.items.length > 1" class="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border border-hair dark:border-dhair text-mute dark:text-[#9C9CA3]" x-text="g.items.length + ' variants'"></span>
+                      </button>
+                    </template>
                 </div>
               </form>
 
@@ -462,7 +467,7 @@
 
             <!-- ===== DRUG DETAIL ===== -->
             <template x-if="drug && !tradeLoading">
-              <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start py-4">
+              <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
                 <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
@@ -557,12 +562,13 @@
                 </article>
 
                 <!-- SIDEBAR — alternatives (grouped by generic name, expandable by route/form) -->
-                <aside class="lg:col-span-3 lg:sticky lg:top-24 self-start">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6">
-                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5">Alternative Drugs</h5>
+                <!-- Stretched to match the main article's height; the group list scrolls inside it. -->
+                <aside class="lg:col-span-3 lg:sticky lg:top-24 h-full">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-full flex flex-col">
+                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">Alternative Drugs</h5>
                     <p x-show="!hasAlternativesData" class="text-sm text-mute dark:text-[#9C9CA3]">Alternatives are not available from this endpoint yet.</p>
                     <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No alternatives in the database.</p>
-                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" class="grid gap-2.5">
+                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" class="grid gap-2.5 flex-1 min-h-0 overflow-y-auto thin-scroll pr-1 content-start">
                       <template x-for="group in alternativeGroups" :key="group.key">
                         <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
                           <!-- group header — click to expand the routes/forms/doses under the same generic name -->
@@ -628,10 +634,12 @@
 
                 <!-- live suggestions — top 5, updates as the user types -->
                 <div x-show="ingSuggestOpen && ingSuggestions.length > 0" x-cloak x-transition
-                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 bg-white dark:bg-coal border dark:border-dhair rounded-2xl overflow-hidden shadow-lg text-left">
+                     class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
+                            bg-[#FAFAF9] dark:bg-[#0A0A0A] backdrop-blur-xl border border-hair dark:border-dhair
+                            shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.8)] ring-1 ring-black/5 dark:ring-white/10">
                   <template x-for="(s, i) in ingSuggestions" :key="(s.display_name || s) + i">
                     <button type="button" @click="pickIngSuggestion(s)"
-                            class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
+                            class="w-full flex items-center justify-between gap-3 px-5 py-3 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors border-b last:border-b-0 border-hair dark:border-dhair">
                       <span class="text-sm font-semibold" x-text="s.display_name || s"></span>
                       <span x-show="s.molecular_formula" class="font-mono text-[11px] text-mute dark:text-[#9C9CA3]" x-text="s.molecular_formula"></span>
                     </button>
@@ -669,7 +677,7 @@
 
             <!-- ===== INGREDIENT DETAIL ===== -->
             <template x-if="found && !ingLoading">
-              <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start py-4">
+              <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start lg:items-stretch py-4">
 
                 <!-- MAIN -->
                 <article class="lg:col-span-7 border border-hair dark:border-dhair rounded-3xl overflow-hidden">
@@ -799,14 +807,14 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — used in -->
-                <aside class="lg:col-span-3 lg:sticky lg:top-24 self-start">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6">
-                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5">
+                <!-- SIDEBAR — used in. Stretched to match the article's height; list scrolls inside it. -->
+                <aside class="lg:col-span-3 lg:sticky lg:top-24 h-full">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-full flex flex-col">
+                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
                       Used in Trade Names <span x-text="'(' + ing.used_in.length + ')'"></span>
                     </h5>
                     <p x-show="ing.used_in.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No registered products found.</p>
-                    <div x-show="ing.used_in.length > 0" class="grid gap-3">
+                    <div x-show="ing.used_in.length > 0" class="grid gap-3 flex-1 min-h-0 overflow-y-auto thin-scroll pr-1 content-start">
                       <template x-for="trade in ing.used_in" :key="trade.trade_name">
                         <button type="button" @click="goToTrade(trade.trade_name)"
                                 class="w-full text-left border border-hair dark:border-dhair rounded-2xl p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
@@ -819,54 +827,60 @@
 
                 </aside>
 
-                <!-- ===== RECEPTOR STRUCTURES ===== -->
+                <!-- ===== RECEPTOR STRUCTURES — full-width, one per row: the 3D view is the main content, not a side thumbnail ===== -->
                 <div x-show="ing.pdb_structures && ing.pdb_structures.length > 0" class="lg:col-span-10">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-7 sm:p-10">
-                    <div class="flex items-end justify-between gap-4 mb-8 flex-wrap">
-                      <div>
-                        <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-1.5">Structural Evidence</p>
-                        <h4 class="text-2xl sm:text-3xl font-extrabold tracking-tightest">Receptor structures</h4>
-                      </div>
-                      <span class="font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.pdb_structures.length + ' structure(s)'"></span>
+                  <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
+                    <div>
+                      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-1.5">Structural Evidence</p>
+                      <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest">Receptor structures</h4>
                     </div>
+                    <span class="font-mono text-sm text-mute dark:text-[#9C9CA3]" x-text="ing.pdb_structures.length + ' structure(s)'"></span>
+                  </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
-                        <div class="border border-hair dark:border-dhair rounded-3xl p-6 flex flex-col bg-white dark:bg-[#141416]">
-                          <div class="relative border border-hair dark:border-dhair rounded-2xl h-56 overflow-hidden bg-zinc-50 dark:bg-coal"
+                  <div class="grid grid-cols-1 gap-8">
+                    <template x-for="pdb in ing.pdb_structures" :key="pdb.pdb_id">
+                      <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden bg-white dark:bg-[#141416]">
+                        <div class="grid grid-cols-1 lg:grid-cols-5">
+                          <!-- interactive 3Dmol viewer — the dominant element of the card -->
+                          <div class="lg:col-span-3 relative h-[340px] sm:h-[440px] lg:h-[520px] overflow-hidden bg-zinc-50 dark:bg-coal border-b lg:border-b-0 lg:border-r border-hair dark:border-dhair"
                                x-init="$nextTick(() => renderReceptor($el, pdb.pdb_id))">
-                            <span class="pointer-events-none absolute bottom-2 right-2 font-mono text-[9px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/70 dark:bg-coal/70 px-2 py-0.5 rounded-full">
-                              Drag · scroll to zoom
+                            <span class="pointer-events-none absolute bottom-3 right-3 font-mono text-[10px] uppercase tracking-[0.15em] text-faint dark:text-[#6E6E76] bg-paper/80 dark:bg-coal/80 backdrop-blur px-2.5 py-1 rounded-full">
+                              Drag to rotate · scroll to zoom
                             </span>
                           </div>
-                          <h5 class="mt-5 text-lg font-bold font-mono" x-text="pdb.pdb_id"></h5>
-                          <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3] mt-0.5">Source: RCSB PDB</p>
-                          <dl class="mt-4 space-y-2 text-xs flex-1">
-                            <div x-show="pdb.experiment_method" class="flex justify-between border-b border-hair dark:border-dhair pb-2">
-                              <dt class="text-mute dark:text-[#9C9CA3]">Method</dt>
-                              <dd class="font-semibold text-right" x-text="pdb.experiment_method"></dd>
+                          <!-- metadata -->
+                          <div class="lg:col-span-2 p-7 sm:p-9 flex flex-col justify-between gap-8">
+                            <div>
+                              <h5 class="text-2xl font-bold font-mono tracking-tight" x-text="pdb.pdb_id"></h5>
+                              <p class="text-[11px] font-mono text-mute dark:text-[#9C9CA3] mt-1">Source: RCSB PDB</p>
+                              <dl class="mt-6 space-y-3 text-sm">
+                                <div x-show="pdb.experiment_method" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
+                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Method</dt>
+                                  <dd class="font-semibold text-right" x-text="pdb.experiment_method"></dd>
+                                </div>
+                                <div x-show="pdb.resolution" class="flex justify-between border-b border-hair dark:border-dhair pb-3">
+                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Resolution</dt>
+                                  <dd class="font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
+                                </div>
+                                <div class="flex justify-between">
+                                  <dt class="text-mute dark:text-[#9C9CA3] font-mono text-xs uppercase tracking-[0.1em] pt-0.5">Ligands extracted</dt>
+                                  <dd>
+                                    <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
+                                       class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
+                                    <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
+                                  </dd>
+                                </div>
+                              </dl>
                             </div>
-                            <div x-show="pdb.resolution" class="flex justify-between border-b border-hair dark:border-dhair pb-2">
-                              <dt class="text-mute dark:text-[#9C9CA3]">Resolution</dt>
-                              <dd class="font-semibold font-mono" x-text="pdb.resolution + ' Å'"></dd>
-                            </div>
-                            <div class="flex justify-between">
-                              <dt class="text-mute dark:text-[#9C9CA3]">Ligands extracted</dt>
-                              <dd>
-                                <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
-                                   class="font-semibold underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
-                                <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
-                              </dd>
-                            </div>
-                          </dl>
-                          <a :href="pdb.download_url" target="_blank"
-                             class="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold
-                                    bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
-                            Download receptor (.pdb)
-                          </a>
+                            <a :href="pdb.download_url" target="_blank"
+                               class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-[13px] font-semibold
+                                      bg-ink dark:bg-snow text-paper dark:text-coal hover:opacity-75 transition-opacity">
+                              Download receptor (.pdb)
+                            </a>
+                          </div>
                         </div>
-                      </template>
-                    </div>
+                      </div>
+                    </template>
                   </div>
                 </div>
 
@@ -941,56 +955,84 @@
         get hasIngredientData() { return this.drug && Array.isArray(this.drug.active_ingredients); },
         get hasAlternativesData() { return this.drug && Array.isArray(this.drug.alternatives); },
 
-        // ---- Live search suggestions (max 5, as the user types) ----
+        // Groups a list of trade-name results by the same generic name that alternativeGroups uses,
+        // so "a" doesn't return five products that are really the same drug in different doses/forms.
+        genericKey(item) {
+          return item.generic_name || item.active_ingredient || item.trade_name;
+        },
+        groupByGeneric(list, limit) {
+          const order = [];
+          const groups = {};
+          for (const item of list) {
+            const key = this.genericKey(item);
+            if (!groups[key]) { groups[key] = { key, items: [] }; order.push(key); }
+            groups[key].items.push(item);
+          }
+          return order.slice(0, limit).map(k => groups[k]);
+        },
+
+        // ---- Live search suggestions (max 5 groups, as the user types) ----
         tradeSuggestions: [],
         tradeSuggestOpen: false,
         tradeSuggestTimer: null,
+        tradeSuggestAbort: null,
         ingSuggestions: [],
         ingSuggestOpen: false,
         ingSuggestTimer: null,
+        ingSuggestAbort: null,
 
         onTradeType() {
           clearTimeout(this.tradeSuggestTimer);
           const q = this.tradeQuery.trim();
-          if (!q) { this.tradeSuggestions = []; this.tradeSuggestOpen = false; return; }
-          this.tradeSuggestTimer = setTimeout(() => this.fetchTradeSuggestions(q), 180);
+          if (!q) { this.tradeSuggestions = []; this.tradeSuggestOpen = false; if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort(); return; }
+          // Short debounce + an abort on every fresh keystroke: a slow, stale request never blocks the next one.
+          this.tradeSuggestTimer = setTimeout(() => this.fetchTradeSuggestions(q), 120);
         },
         async fetchTradeSuggestions(q) {
+          if (this.tradeSuggestAbort) this.tradeSuggestAbort.abort();
+          const controller = new AbortController();
+          this.tradeSuggestAbort = controller;
           try {
-            const res = await fetch(`${API_BASE}/trade_name/${encodeURIComponent(q)}`);
+            const res = await fetch(`${API_BASE}/trade_name/${encodeURIComponent(q)}`, { signal: controller.signal });
             if (!res.ok) { this.tradeSuggestions = []; this.tradeSuggestOpen = false; return; }
             const data = await res.json();
             const list = Array.isArray(data) ? data : [data];
-            this.tradeSuggestions = list.slice(0, 5);
+            this.tradeSuggestions = this.groupByGeneric(list, 5);
             this.tradeSuggestOpen = this.tradeSuggestions.length > 0 && this.tradeQuery.trim() === q;
           } catch (err) {
+            if (err.name === 'AbortError') return; // superseded by a newer keystroke — ignore
             this.tradeSuggestions = [];
             this.tradeSuggestOpen = false;
           }
         },
-        pickTradeSuggestion(s) {
+        pickTradeSuggestion(group) {
           this.tradeSuggestOpen = false;
-          this.tradeQuery = s.trade_name;
+          // One variant → open it directly. Several → search the generic name so the full grouped list shows.
+          this.tradeQuery = group.items.length === 1 ? group.items[0].trade_name : group.key;
           this.searchTrade();
         },
 
         onIngType() {
           clearTimeout(this.ingSuggestTimer);
           const q = this.ingQuery.trim();
-          if (!q) { this.ingSuggestions = []; this.ingSuggestOpen = false; return; }
-          this.ingSuggestTimer = setTimeout(() => this.fetchIngSuggestions(q), 180);
+          if (!q) { this.ingSuggestions = []; this.ingSuggestOpen = false; if (this.ingSuggestAbort) this.ingSuggestAbort.abort(); return; }
+          this.ingSuggestTimer = setTimeout(() => this.fetchIngSuggestions(q), 120);
         },
         async fetchIngSuggestions(q) {
           // Assumes a lightweight search endpoint alongside the exact-match detail endpoint.
           // Falls back silently (suggestions just stay empty) if it doesn't exist yet.
+          if (this.ingSuggestAbort) this.ingSuggestAbort.abort();
+          const controller = new AbortController();
+          this.ingSuggestAbort = controller;
           try {
-            const res = await fetch(`${API_BASE}/active_ingredient/search/${encodeURIComponent(q)}`);
+            const res = await fetch(`${API_BASE}/active_ingredient/search/${encodeURIComponent(q)}`, { signal: controller.signal });
             if (!res.ok) { this.ingSuggestions = []; this.ingSuggestOpen = false; return; }
             const data = await res.json();
             const list = Array.isArray(data) ? data : [data];
             this.ingSuggestions = list.slice(0, 5);
             this.ingSuggestOpen = this.ingSuggestions.length > 0 && this.ingQuery.trim() === q;
           } catch (err) {
+            if (err.name === 'AbortError') return;
             this.ingSuggestions = [];
             this.ingSuggestOpen = false;
           }
@@ -1009,12 +1051,7 @@
         },
         get alternativeGroups() {
           if (!this.hasAlternativesData) return [];
-          const groups = {};
-          for (const alt of this.drug.alternatives) {
-            const key = alt.generic_name || alt.active_ingredient || alt.trade_name;
-            (groups[key] ||= { key, items: [] }).items.push(alt);
-          }
-          return Object.values(groups);
+          return this.groupByGeneric(this.drug.alternatives, this.drug.alternatives.length);
         },
 
         // Flatten DDI rows from every ingredient — exactly the DrugInteraction schema:
