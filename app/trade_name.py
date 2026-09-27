@@ -78,13 +78,19 @@ async def _batch_ingredients(db: AsyncSession, drug_ids: list[int]):
 
 
 async def _batch_interactions(db: AsyncSession, cids: list[str]) -> dict[str, list[DrugInteraction]]:
-    """كل التفاعلات الدوائية لقائمة cids في كويري واحد."""
+    """كل التفاعلات الدوائية لقائمة cids في كويري واحد.
+
+    ملاحظة: عمود المادة الفعالة في جدول ingredient_drug_interactions اسمه
+    ingredient_pubchem_cid مش pubchem_cid (ده كان سبب الخطأ
+    "column pubchem_cid does not exist") - بنعمل alias بـAS pubchem_cid
+    عشان الكود اللي بيقرا row["pubchem_cid"] تحت يفضل شغال من غير تعديل.
+    """
     if not cids:
         return {}
     result = await db.execute(
         text(
             """
-            SELECT pubchem_cid::text AS pubchem_cid,
+            SELECT ingredient_pubchem_cid::text AS pubchem_cid,
                    interaction_type,
                    interacting_class_name,
                    interacting_drug_name,
@@ -92,7 +98,7 @@ async def _batch_interactions(db: AsyncSession, cids: list[str]) -> dict[str, li
                    severity,
                    mechanism_description
             FROM ingredient_drug_interactions
-            WHERE pubchem_cid::text = ANY(:cids)
+            WHERE ingredient_pubchem_cid::text = ANY(:cids)
             """
         ),
         {"cids": cids},
