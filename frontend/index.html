@@ -588,121 +588,65 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — alternatives. Same fixed-height box shape as the
-                     "Used in Trade Names" aside on the ingredient page: the card
-                     keeps a set height and only the list scrolls inside it.
-                     Content stays exactly as before (grouped by generic name). -->
-                <style>
-                  [x-cloak] {
-                    display: none !important;
-                  }
-                </style>
-                
-                  <aside class="lg:col-span-3">
-                    <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[560px] max-h-[560px] flex flex-col">
-                
-                      <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
-                        Alternative Drugs
-                
-                        <span
-                          x-show="hasAlternativesData && drug.alternatives.length > 0"
-                          x-cloak
-                          x-text="'(' + drug.alternatives.length + ')'">
-                        </span>
-                      </h5>
-                
-                      <p
-                        x-show="!hasAlternativesData"
-                        x-cloak
-                        class="text-sm text-mute dark:text-[#9C9CA3]">
-                        Alternatives are not available from this endpoint yet.
-                      </p>
-                
-                      <p
-                        x-show="hasAlternativesData && drug.alternatives.length === 0"
-                        x-cloak
-                        class="text-sm text-mute dark:text-[#9C9CA3]">
-                        No alternatives with the exact same ingredient set.
-                      </p>
-                
-                      <div
-                        x-show="hasAlternativesData && drug.alternatives.length > 0"
-                        x-cloak
-                        class="grid gap-2.5 overflow-y-auto thin-scroll pr-1">
-                
-                        <template
-                          x-for="group in alternativeGroups"
-                          :key="group.key">
-                
-                          <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
-                
-                            <button
-                              type="button"
-                              @click="toggleAltGroup(group.key)"
-                              class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
-                
-                              <span>
-                                <span
-                                  class="font-bold text-sm"
-                                  x-text="group.key">
-                                </span>
-                
-                                <span
-                                  class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]"
-                                  x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')">
-                                </span>
-                              </span>
-                
-                              <svg
-                                class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]"
-                                :class="openAltGroups.includes(group.key) ? 'rotate-180' : ''"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-                
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="1.5"
-                                  d="M19 9l-7 7-7-7">
-                                </path>
-                              </svg>
-                            </button>
-                
-                            <div
-                              x-show="openAltGroups.includes(group.key)"
-                              x-cloak
-                              class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
-                
-                              <template
-                                x-for="alt in group.items"
-                                :key="alt.trade_name + (alt.manufacturer || '')">
-                
-                                <button
-                                  type="button"
-                                  @click="
-                                    tradeQuery = alt.trade_name;
-                                    searchTrade();
-                                  "
-                                  class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
-                
-                                  <span
-                                    class="font-semibold text-sm"
-                                    x-text="alt.trade_name">
-                                  </span>
-                
-                                  <p
-                                    class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]"
-                                    x-text="alt.manufacturer || 'Unknown manufacturer'">
-                                  </p>
-                                </button>
-                              </template>
-                            </div>
+                <!-- SIDEBAR — alternatives. Fixed-height box, only the list scrolls inside it. -->
+                <aside class="lg:col-span-3">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[560px] max-h-[70vh] flex flex-col overflow-hidden">
+
+                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
+                      Alternative Drugs
+                      <span x-show="hasAlternativesData && drug.alternatives.length > 0" x-cloak
+                            x-text="'(' + drug.alternatives.length + ')'"></span>
+                    </h5>
+
+                    <p x-show="!hasAlternativesData" x-cloak class="text-sm text-mute dark:text-[#9C9CA3]">
+                      Alternatives are not available from this endpoint yet.
+                    </p>
+
+                    <p x-show="hasAlternativesData && drug.alternatives.length === 0" x-cloak
+                       class="text-sm text-mute dark:text-[#9C9CA3]">
+                      No alternatives with the exact same ingredient set.
+                    </p>
+
+                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" x-cloak
+                         class="flex-1 min-h-0 overflow-y-auto thin-scroll pr-1">
+
+                      <template x-for="group in alternativeGroups" :key="group.key">
+                        <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden mb-2.5 last:mb-0">
+
+                          <button type="button" @click="toggleAltGroup(group.key)"
+                                  class="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
+
+                            <span class="min-w-0">
+                              <span class="font-bold text-sm block truncate" x-text="group.key"></span>
+                              <span class="block mt-0.5 text-xs text-mute dark:text-[#9C9CA3]"
+                                    x-text="group.items.length + (group.items.length === 1 ? ' variant' : ' variants')"></span>
+                            </span>
+
+                            <svg class="w-4 h-4 shrink-0 transition-transform text-mute dark:text-[#9C9CA3]"
+                                 :class="openAltGroups.includes(group.key) ? 'rotate-180' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                          </button>
+
+                          <div x-show="openAltGroups.includes(group.key)" x-cloak
+                               class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
+
+                            <template x-for="alt in group.items" :key="alt.trade_name + (alt.manufacturer || '')">
+                              <button type="button"
+                                      @click="tradeQuery = alt.trade_name; searchTrade();"
+                                      class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                                <span class="font-semibold text-sm block truncate" x-text="alt.trade_name"></span>
+                                <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3] truncate"
+                                   x-text="alt.manufacturer || 'Unknown manufacturer'"></p>
+                              </button>
+                            </template>
                           </div>
-                        </template>
-                      </div>
+                        </div>
+                      </template>
                     </div>
-                  </aside>
+                  </div>
+                </aside>
 
                 <!-- close drug-detail grid, drug-detail template, trade-mode wrapper, trade x-if template -->
                 </div>
@@ -922,16 +866,16 @@
 
                 <!-- SIDEBAR — used in. Auto-height card, list scrolls internally. -->
                 <aside class="lg:col-span-3">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 max-h-[560px] flex flex-col">
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[560px] max-h-[70vh] flex flex-col overflow-hidden">
                     <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
                       Used in Trade Names <span x-text="'(' + ing.used_in.length + ')'"></span>
                     </h5>
                     <p x-show="ing.used_in.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No registered products found.</p>
-                    <div x-show="ing.used_in.length > 0" class="grid gap-2.5 overflow-y-auto thin-scroll pr-1">
+                    <div x-show="ing.used_in.length > 0" class="flex-1 min-h-0 overflow-y-auto thin-scroll pr-1">
                       <template x-for="trade in ing.used_in" :key="trade.trade_name">
                         <button type="button" @click="goToTrade(trade.trade_name)"
                                 class="w-full text-left border border-hair dark:border-dhair rounded-2xl p-4 hover:bg-zinc-100/20 dark:hover:bg-white/[0.06] transition-colors">
-                          <span class="font-bold text-sm" x-text="trade.trade_name"></span>
+                          <span class="font-bold text-sm block truncate" x-text="trade.trade_name"></span>
                           <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3]" x-text="trade.manufacturer"></p>
                         </button>
                       </template>
