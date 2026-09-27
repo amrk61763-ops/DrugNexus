@@ -397,7 +397,7 @@
                 <!-- live suggestions — fast dedicated endpoint, min 2 chars, aborts stale requests -->
                 <div x-show="tradeSuggestOpen" x-cloak x-transition
                      class="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-2xl overflow-hidden text-left
-                            bg-white dark:bg-coal border border-hair dark:border-dhair
+                            bg-white dark:bg-[#1C1C1E] border border-hair dark:border-dhair
                             shadow-[0_16px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.9)] ring-1 ring-black/[0.06] dark:ring-white/10">
                     <div x-show="tradeSuggestLoading" x-cloak class="flex items-center gap-2.5 px-5 py-3.5 text-mute dark:text-[#9C9CA3]">
                       <svg class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
@@ -478,7 +478,7 @@
                   </button>
                 </template>
               </div>
-            </div>
+            </div>+
 
             <!-- ===== DRUG DETAIL ===== -->
             <template x-if="drug && !tradeLoading">
@@ -555,7 +555,7 @@
 
                     <!-- ===== DDI PANEL ===== -->
                     <div x-show="hasIngredientData && allInteractions.length > 0" class="border border-hair dark:border-dhair rounded-3xl overflow-hidden">
-                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-coal">
+                      <div class="px-6 sm:px-8 py-5 flex items-center justify-between border-b border-hair dark:border-dhair bg-zinc-100 dark:bg-[#1C1C1E]">
                         <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Drug Interactions</h5>
                         <span class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="allInteractions.length + ' pairs'"></span>
                       </div>
