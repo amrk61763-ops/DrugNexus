@@ -584,14 +584,13 @@
                   </div>
                 </article>
 
-                <!-- SIDEBAR — alternatives. Auto-height card (the old fixed 420px
-                     box was the "empty white box" bug), grouped by generic name. -->
+                <!-- SIDEBAR — alternatives. Same fixed-height/scroll shape as Active Ingredient sidebar. -->
                 <aside class="lg:col-span-3">
-                  <div class="border border-hair dark:border-dhair rounded-3xl p-6">
-                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5">Alternative Drugs</h5>
+                  <div class="border border-hair dark:border-dhair rounded-3xl p-6 max-h-[560px] flex flex-col">
+                    <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">Alternative Drugs</h5>
                     <p x-show="!hasAlternativesData" class="text-sm text-mute dark:text-[#9C9CA3]">Alternatives are not available from this endpoint yet.</p>
                     <p x-show="hasAlternativesData && drug.alternatives.length === 0" class="text-sm text-mute dark:text-[#9C9CA3]">No alternatives with the exact same ingredient set.</p>
-                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" class="grid gap-2.5">
+                    <div x-show="hasAlternativesData && drug.alternatives.length > 0" class="grid gap-2.5 overflow-y-auto thin-scroll pr-1">
                       <template x-for="group in alternativeGroups" :key="group.key">
                         <div class="border border-hair dark:border-dhair rounded-2xl overflow-hidden">
                           <button type="button" @click="toggleAltGroup(group.key)"
