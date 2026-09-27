@@ -599,7 +599,7 @@
                 </style>
                 
                   <aside class="lg:col-span-3">
-                    <div class="border border-hair dark:border-dhair rounded-3xl p-6 max-h-[560px] flex flex-col">
+                    <div class="border border-hair dark:border-dhair rounded-3xl p-6 h-[560px] max-h-[560px] flex flex-col">
                 
                       <h5 class="font-mono text-[11px] uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3] mb-5 shrink-0">
                         Alternative Drugs
@@ -1288,29 +1288,23 @@
         },
 
         groupByAlternativeGeneric(alternatives) {
-          const groups = {};
-
           if (!Array.isArray(alternatives)) return [];
 
+          // Group by the first word of the trade name, so e.g.
+          // "Augmentin 1g", "Augmentin 1.2g" and "Augmentin oral" all
+          // collapse under a single "Augmentin" group.
+          const groups = {};
+
           alternatives.forEach(alt => {
-            const genericName =
-              alt.genericName ||
-              alt.generic_name ||
-              alt.generic ||
-              alt.active_ingredient ||
-              'Other';
-
-            if (!groups[genericName]) {
-              groups[genericName] = [];
-            }
-
-            groups[genericName].push(alt);
+            const key = this.genericKey(alt);
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(alt);
           });
 
-          return Object.entries(groups).map(([key, items]) => ({
-            key,
-            items
-          }));
+          // Sort groups alphabetically so the list order is stable
+          return Object.entries(groups)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([key, items]) => ({ key, items }));
         },
 
         setDrug(data) {
