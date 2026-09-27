@@ -703,9 +703,12 @@
                       </div>
                     </div>
                   </aside>
-                
 
-
+                <!-- close drug-detail grid, drug-detail template, trade-mode wrapper, trade x-if template -->
+                </div>
+            </template>
+          </div>
+        </template>
 
         <!-- ========== ACTIVE INGREDIENT SEARCH ========== -->
         <template x-if="mode === 'ingredient'">
@@ -1238,6 +1241,25 @@
         tradeResults: [],
         drug: null,
 
+        get hasIngredientData() { return this.drug && Array.isArray(this.drug.active_ingredients); },
+        get hasAlternativesData() { return this.drug && Array.isArray(this.drug.alternatives); },
+
+        genericKey(item) {
+          const name = (item.trade_name || '').trim();
+          const firstWord = name.split(/[\s\-]+/)[0];
+          return firstWord || name || 'unknown';
+        },
+        groupByGeneric(list, limit) {
+          const order = [];
+          const groups = {};
+          for (const item of list) {
+            const key = this.genericKey(item);
+            if (!groups[key]) { groups[key] = { key, items: [] }; order.push(key); }
+            groups[key].items.push(item);
+          }
+          return order.slice(0, limit).map(k => groups[k]);
+        },
+
         // ---- API data availability ----
         hasAlternativesData: false,
         hasIngredientData: false,
@@ -1262,11 +1284,13 @@
             return [];
           }
 
-          return this.groupByGeneric(alternatives);
+          return this.groupByAlternativeGeneric(alternatives);
         },
 
-        groupByGeneric(alternatives) {
+        groupByAlternativeGeneric(alternatives) {
           const groups = {};
+
+          if (!Array.isArray(alternatives)) return [];
 
           alternatives.forEach(alt => {
             const genericName =
@@ -1289,32 +1313,6 @@
           }));
         },
 
-        // ---- Trade-name suggestions grouped separately ----
-        genericKey(item) {
-          const name = (item.trade_name || '').trim();
-          const firstWord = name.split(/[\s\-]+/)[0];
-          return firstWord || name || 'unknown';
-        },
-
-        groupTradeSuggestions(list, limit = 5) {
-          const order = [];
-          const groups = {};
-
-          for (const item of Array.isArray(list) ? list : []) {
-            const key = this.genericKey(item);
-
-            if (!groups[key]) {
-              groups[key] = { key, items: [] };
-              order.push(key);
-            }
-
-            groups[key].items.push(item);
-          }
-
-          return order.slice(0, limit).map(k => groups[k]);
-        },
-
-        // Normalize API data so Alpine always works with arrays.
         setDrug(data) {
           if (!data) {
             this.drug = null;
@@ -1326,35 +1324,22 @@
 
           this.drug = {
             ...data,
-            alternatives: Array.isArray(data.alternatives)
-              ? data.alternatives
-              : [],
+            alternatives: Array.isArray(data.alternatives) ? data.alternatives : [],
             active_ingredients: Array.isArray(data.active_ingredients)
               ? data.active_ingredients
               : []
           };
 
-          this.hasAlternativesData = true;
-          this.hasIngredientData = true;
+          this.hasAlternativesData = Array.isArray(data.alternatives);
+          this.hasIngredientData = Array.isArray(data.active_ingredients);
           this.openAltGroups = [];
         },
 
-        // ---- Flatten DDI rows from every ingredient ----
+        // Flatten DDI rows from every ingredient
         get allInteractions() {
-          const ingredients = this.drug?.active_ingredients || [];
-
-          if (!this.hasIngredientData || ingredients.length === 0) {
-            return [];
-          }
-
-          return ingredients.flatMap(ingredient =>
-            (ingredient.interactions || []).map(interaction => ({
-              ingredient:
-                ingredient.display_name ||
-                ingredient.name ||
-                '',
-              ...interaction
-            }))
+          if (!this.hasIngredientData) return [];
+          return this.drug.active_ingredients.flatMap(ai =>
+            (ai.interactions || []).map(ix => ({ ingredient: ai.display_name, ...ix }))
           );
         },
 
@@ -1407,7 +1392,7 @@
               `${API_BASE}/trade_name/search?q=${encodeURIComponent(q)}`,
               (data) => {
                 const list = Array.isArray(data) ? data : [];
-                this.tradeSuggestions = this.groupTradeSuggestions(list, 5);
+                this.tradeSuggestions = this.groupByGeneric(list, 5);
                 this.tradeSuggestOpen = this.tradeSuggestions.length > 0;
               },
               () => { this.tradeSuggestLoading = false; }
@@ -1546,7 +1531,7 @@
               `${API_BASE}/trade_name/search?q=${encodeURIComponent(q)}`,
               (data) => {
                 const list = Array.isArray(data) ? data : [];
-                this.listSuggestions = this.groupTradeSuggestions(list, 5);
+                this.listSuggestions = this.groupByGeneric(list, 5);
                 this.listSuggestOpen = this.listSuggestions.length > 0;
               },
               () => { this.listSuggestLoading = false; }
