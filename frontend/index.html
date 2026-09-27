@@ -1443,7 +1443,7 @@
           const dark = document.documentElement.classList.contains('dark');
           const viewer = $3Dmol.createViewer(el, { backgroundColor: dark ? '#1C1C1E' : '#FAFAFA' });
           $3Dmol.download('pdb:' + pdbId, viewer, {}, () => {
-            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+            viewer.setStyle({}, { ball-and-stick : { color: 'spectrum' } });
             viewer.zoomTo();
             viewer.render();
           });
