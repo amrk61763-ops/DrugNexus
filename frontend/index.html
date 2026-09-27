@@ -462,7 +462,7 @@
               </div>
               <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden divide-y divide-hair dark:divide-dhair">
                 <template x-for="(r, idx) in tradeResults" :key="r.trade_name">
-                  <button type="button" @click="drug = r"
+                  <button type="button" @click="setDrug(r)"
                           class="group w-full text-left bg-paper dark:bg-coal px-6 sm:px-8 py-5 hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] transition-colors
                                  flex items-center gap-5 sm:gap-8">
                     <span class="font-mono text-sm text-faint dark:text-[#6E6E76] w-8 shrink-0" x-text="String(idx + 1).padStart(2, '0')"></span>
@@ -489,7 +489,7 @@
                   <header class="p-8 sm:p-10 border-b border-hair dark:border-dhair">
                     <div class="flex items-start justify-between gap-4">
                       <h4 class="text-3xl sm:text-4xl font-extrabold tracking-tightest" x-text="drug.trade_name"></h4>
-                      <button type="button" x-show="tradeResults.length > 1" @click="drug = null"
+                      <button type="button" x-show="tradeResults.length > 1" @click="setDrug(null)"
                               class="text-xs text-mute dark:text-[#9C9CA3] underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow shrink-0 transition-colors">
                         ← all matches
                       </button>
@@ -598,8 +598,6 @@
                   }
                 </style>
                 
-                <div x-data="drugPage">
-                
                   <aside class="lg:col-span-3">
                     <div class="border border-hair dark:border-dhair rounded-3xl p-6 max-h-[560px] flex flex-col">
                 
@@ -706,7 +704,7 @@
                     </div>
                   </aside>
                 
-                </div>
+
 
 
         <!-- ========== ACTIVE INGREDIENT SEARCH ========== -->
@@ -1240,115 +1238,123 @@
         tradeResults: [],
         drug: null,
 
-        get hasIngredientData() { return this.drug && Array.isArray(this.drug.active_ingredients); },
-        get hasAlternativesData() { return this.drug && Array.isArray(this.drug.alternatives); },
+        // ---- API data availability ----
+        hasAlternativesData: false,
+        hasIngredientData: false,
 
+        // ---- Alternatives, grouped by generic name ----
+        openAltGroups: [],
+
+        toggleAltGroup(key) {
+          const index = this.openAltGroups.indexOf(key);
+
+          if (index === -1) {
+            this.openAltGroups.push(key);
+          } else {
+            this.openAltGroups.splice(index, 1);
+          }
+        },
+
+        get alternativeGroups() {
+          const alternatives = this.drug?.alternatives || [];
+
+          if (!this.hasAlternativesData || alternatives.length === 0) {
+            return [];
+          }
+
+          return this.groupByGeneric(alternatives);
+        },
+
+        groupByGeneric(alternatives) {
+          const groups = {};
+
+          alternatives.forEach(alt => {
+            const genericName =
+              alt.genericName ||
+              alt.generic_name ||
+              alt.generic ||
+              alt.active_ingredient ||
+              'Other';
+
+            if (!groups[genericName]) {
+              groups[genericName] = [];
+            }
+
+            groups[genericName].push(alt);
+          });
+
+          return Object.entries(groups).map(([key, items]) => ({
+            key,
+            items
+          }));
+        },
+
+        // ---- Trade-name suggestions grouped separately ----
         genericKey(item) {
           const name = (item.trade_name || '').trim();
           const firstWord = name.split(/[\s\-]+/)[0];
           return firstWord || name || 'unknown';
         },
-        groupByGeneric(list, limit) {
+
+        groupTradeSuggestions(list, limit = 5) {
           const order = [];
           const groups = {};
-          for (const item of list) {
+
+          for (const item of Array.isArray(list) ? list : []) {
             const key = this.genericKey(item);
-            if (!groups[key]) { groups[key] = { key, items: [] }; order.push(key); }
+
+            if (!groups[key]) {
+              groups[key] = { key, items: [] };
+              order.push(key);
+            }
+
             groups[key].items.push(item);
           }
+
           return order.slice(0, limit).map(k => groups[k]);
         },
 
-        // ---- Alternatives, grouped by generic name ----
-        document.addEventListener('alpine:init', () => {
-          Alpine.data('drugPage', () => ({
-        
-            drug: {
-              alternatives: [],
-              active_ingredients: []
-            },
-        
-            hasAlternativesData: false,
-            hasIngredientData: false,
-        
-            openAltGroups: [],
-            tradeQuery: '',
-        
-            toggleAltGroup(key) {
-              const index = this.openAltGroups.indexOf(key);
-        
-              if (index === -1) {
-                this.openAltGroups.push(key);
-              } else {
-                this.openAltGroups.splice(index, 1);
-              }
-            },
-        
-            get alternativeGroups() {
-              const alternatives = this.drug?.alternatives || [];
-        
-              if (!this.hasAlternativesData || alternatives.length === 0) {
-                return [];
-              }
-        
-              return this.groupByGeneric(alternatives);
-            },
-        
-            groupByGeneric(alternatives) {
-              const groups = {};
-        
-              alternatives.forEach(alt => {
-                const genericName =
-                  alt.generic_name ||
-                  alt.genericName ||
-                  alt.generic ||
-                  alt.active_ingredient ||
-                  'Other';
-        
-                if (!groups[genericName]) {
-                  groups[genericName] = [];
-                }
-        
-                groups[genericName].push(alt);
-              });
-        
-              return Object.entries(groups).map(([key, items]) => ({
-                key,
-                items
-              }));
-            },
-        
-            get allInteractions() {
-              const ingredients = this.drug?.active_ingredients || [];
-        
-              if (!this.hasIngredientData || ingredients.length === 0) {
-                return [];
-              }
-        
-              return ingredients.flatMap(ingredient =>
-                (ingredient.interactions || []).map(interaction => ({
-                  ingredient:
-                    ingredient.display_name ||
-                    ingredient.name ||
-                    '',
-                  ...interaction
-                }))
-              );
-            },
-        
-            searchTrade() {
-              // Use your existing search function here.
-              console.log('Searching for:', this.tradeQuery);
-            }
-        
-          }));
-        });
+        // Normalize API data so Alpine always works with arrays.
+        setDrug(data) {
+          if (!data) {
+            this.drug = null;
+            this.hasAlternativesData = false;
+            this.hasIngredientData = false;
+            this.openAltGroups = [];
+            return;
+          }
 
-        // Flatten DDI rows from every ingredient
+          this.drug = {
+            ...data,
+            alternatives: Array.isArray(data.alternatives)
+              ? data.alternatives
+              : [],
+            active_ingredients: Array.isArray(data.active_ingredients)
+              ? data.active_ingredients
+              : []
+          };
+
+          this.hasAlternativesData = true;
+          this.hasIngredientData = true;
+          this.openAltGroups = [];
+        },
+
+        // ---- Flatten DDI rows from every ingredient ----
         get allInteractions() {
-          if (!this.hasIngredientData) return [];
-          return this.drug.active_ingredients.flatMap(ai =>
-            (ai.interactions || []).map(ix => ({ ingredient: ai.display_name, ...ix }))
+          const ingredients = this.drug?.active_ingredients || [];
+
+          if (!this.hasIngredientData || ingredients.length === 0) {
+            return [];
+          }
+
+          return ingredients.flatMap(ingredient =>
+            (ingredient.interactions || []).map(interaction => ({
+              ingredient:
+                ingredient.display_name ||
+                ingredient.name ||
+                '',
+              ...interaction
+            }))
           );
         },
 
@@ -1401,7 +1407,7 @@
               `${API_BASE}/trade_name/search?q=${encodeURIComponent(q)}`,
               (data) => {
                 const list = Array.isArray(data) ? data : [];
-                this.tradeSuggestions = this.groupByGeneric(list, 5);
+                this.tradeSuggestions = this.groupTradeSuggestions(list, 5);
                 this.tradeSuggestOpen = this.tradeSuggestions.length > 0;
               },
               () => { this.tradeSuggestLoading = false; }
@@ -1420,7 +1426,7 @@
           this.tradeLoading = true;
           this.tradeSearched = true;
           this.tradeResults = [];
-          this.drug = null;
+          this.setDrug(null);
           try {
             const res = await fetch(`${API_BASE}/trade_name/${encodeURIComponent(q)}`);
             if (!res.ok) throw new Error(`API returned ${res.status}`);
@@ -1429,7 +1435,7 @@
             console.error('Trade name search failed:', err);
             this.tradeResults = [];
           }
-          if (this.tradeResults.length === 1) this.drug = this.tradeResults[0];
+          if (this.tradeResults.length === 1) this.setDrug(this.tradeResults[0]);
           this.tradeLoading = false;
         },
 
@@ -1540,7 +1546,7 @@
               `${API_BASE}/trade_name/search?q=${encodeURIComponent(q)}`,
               (data) => {
                 const list = Array.isArray(data) ? data : [];
-                this.listSuggestions = this.groupByGeneric(list, 5);
+                this.listSuggestions = this.groupTradeSuggestions(list, 5);
                 this.listSuggestOpen = this.listSuggestions.length > 0;
               },
               () => { this.listSuggestLoading = false; }
