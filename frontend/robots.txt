@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /docs
+Disallow: /redoc
+Disallow: /openapi.json
+Disallow: /health
+Disallow: /trade_name/
+Disallow: /active_ingredient/
+
+Sitemap: https://viadrug.app/sitemap.xml

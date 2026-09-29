@@ -4,8 +4,60 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
-  <title>ViaDrug — Trusted Scientific Drug Reference</title>
-  <meta name="description" content="Search 14,000+ trade names and 1,700+ active ingredients in the Egyptian drug market. Grounded in PubChem, ChEMBL, Drug Central and RCSB PDB." />
+  <title>ViaDrug — Egyptian Drug Database: Trade Names &amp; Active Ingredients</title>
+  <meta name="description" content="Search 14,000+ Egyptian drug trade names and 1,700+ active ingredients. Find alternatives, interactions and structures from PubChem, ChEMBL and DrugCentral." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Amr Khaled Abdelkader" />
+  <meta name="application-name" content="ViaDrug" />
+  <link rel="canonical" href="https://viadrug.app/" />
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ViaDrug" />
+  <meta property="og:title" content="ViaDrug — Egyptian Drug Database: Trade Names &amp; Active Ingredients" />
+  <meta property="og:description" content="Connect any Egyptian trade name to its active ingredient, alternatives, drug interactions and molecular structures." />
+  <meta property="og:url" content="https://viadrug.app/" />
+  <meta property="og:image" content="https://viadrug.app/assets/hero-molecule.png" />
+  <meta property="og:image:alt" content="Ball-and-stick molecular model — ViaDrug" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="ar_EG" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ViaDrug — Egyptian Drug Database" />
+  <meta name="twitter:description" content="Trade names to active ingredients, alternatives, interactions and structures." />
+  <meta name="twitter:image" content="https://viadrug.app/assets/hero-molecule.png" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://viadrug.app/#org",
+        "name": "ViaDrug",
+        "url": "https://viadrug.app/",
+        "logo": "https://viadrug.app/assets/logo.png",
+        "founder": {
+          "@type": "Person",
+          "name": "Amr Khaled Abdelkader",
+          "sameAs": ["https://www.linkedin.com/in/amr-khaled-085851379"]
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://viadrug.app/#website",
+        "url": "https://viadrug.app/",
+        "name": "ViaDrug",
+        "alternateName": ["Via Drug", "ViaDrug Egyptian Drug Database"],
+        "description": "A scientific reference connecting Egyptian drug trade names to active ingredients, drug interactions and structural data.",
+        "inLanguage": ["en", "ar"],
+        "publisher": { "@id": "https://viadrug.app/#org" }
+      }
+    ]
+  }
+  </script>
 
   <link rel="icon" href="assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,7 +65,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+  <script defer src="https://3Dmol.org/build/3Dmol-min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>
     // ===== ViaDrug Design System V2 — monochrome scientific =====
@@ -117,7 +169,7 @@
     <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="/" class="flex items-center gap-1 group">
         <span class="w-6 h-6 rounded-full grid place-items-center transition-transform duration-500 group-hover:rotate-180">
-          <img src="assets/logo.png" data-logo alt="logo" class="w-5 h-5">
+          <img src="assets/logo.png" data-logo alt="ViaDrug logo" class="w-5 h-5">
         </span>
         <span class="text-[15px] font-bold tracking-tight">ViaDrug</span>
       </a>
@@ -165,12 +217,12 @@
         </div>
 
         <h1 class="text-5xl sm:text-6xl lg:text-[4.35rem] font-extrabold leading-[1.02] tracking-tightest">
-          Deepen your<br/>knowlage in<br/>
+          Deepen your<br/>knowledge of<br/>
           <span class="text-mute dark:text-[#9C9CA3]">the drug</span>
         </h1>
 
         <p class="mt-6 text-[15px] text-mute dark:text-[#9C9CA3] leading-relaxed max-w-sm">
-          ViaDrug connects every trade name to the chemistry underneath it — ingredient
+          ViaDrug connects every Egyptian trade name to the chemistry underneath it — ingredient
           breakdowns, drug–drug interactions, pharmacology, and ready-to-dock
           receptor &amp; ligand structure files.
         </p>
@@ -225,8 +277,8 @@
         <p class="mt-1.5 text-[11px] font-mono uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">PDB files</p>
       </div>
       <div class="py-10 md:pl-8">
-        <p class="font-mono text-3xl sm:text-4xl font-semibold tracking-tight">700+</p>
-        <p class="mt-1.5 text-[11px] font-mono uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">DDI pairs</p>
+        <p class="font-mono text-3xl sm:text-4xl font-semibold tracking-tight">10,000+</p>
+        <p class="mt-1.5 text-[11px] font-mono uppercase tracking-[0.2em] text-mute dark:text-[#9C9CA3]">Interaction records</p>
       </div>
     </div>
   </section>
@@ -301,7 +353,7 @@
           <div class="absolute bottom-4 left-4 right-4 bg-paper dark:bg-coal backdrop-blur-2xl rounded-2xl p-6 border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.9)]">
             <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#000000] dark:text-[#FAFAF9] mb-2">Feature — 01</p>
             <h3 class="text-lg text-[#000000] dark:text-[#FAFAF9] font-bold">Pharmacology Data</h3>
-            <p class="mt-1.5 text-sm text-[#000000] dark:text-[#FAFAF9] leading-relaxed">Full pharmacological profiles for every active ingredient — indication, half-life, pharmacodynamics.</p>
+            <p class="mt-1.5 text-sm text-[#000000] dark:text-[#FAFAF9] leading-relaxed">Pharmacological profiles for active ingredients — indication, half-life, pharmacodynamics — wherever the source databases provide them.</p>
           </div>
         </div>
         <div class="md:col-span-7 bg-paper dark:bg-coal p-8 sm:p-10 flex flex-col justify-center gap-6">
@@ -314,7 +366,7 @@
         </div>
         <div class="md:col-span-4 bg-paper dark:bg-coal p-8">
           <h3 class="text-lg font-bold">Drug Interactions</h3>
-          <p class="mt-2.5 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">Check every ingredient against 700+ curated DDI pairs — severity and mechanism included.</p>
+          <p class="mt-2.5 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">Check every ingredient against 10,000+ curated interaction records — severity and mechanism included.</p>
         </div>
         <div class="md:col-span-4 bg-paper dark:bg-coal p-8">
           <h3 class="text-lg font-bold">Protein Binding</h3>
@@ -684,7 +736,7 @@
           <div>
             <div class="pb-12 text-center">
               <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tightest">Active Ingredient Search</h3>
-              <p class="mt-3 text-mute dark:text-[#9C9CA3]">1,700+ active ingredients with full pharmacological data</p>
+              <p class="mt-3 text-mute dark:text-[#9C9CA3]">1,700+ active ingredients with pharmacological data where available</p>
 
               <form @submit.prevent="ingSuggestOpen = false; searchIngredient()" class="max-w-xl mx-auto mt-9 relative" @click.outside="ingSuggestOpen = false">
                 <input type="text" x-model="ingQuery" autocomplete="off"
@@ -1643,7 +1695,7 @@
       <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-faint dark:text-[#8E8E96]">Advertisement</span>
       <span class="text-xs text-mute dark:text-[#8E8E96]">Banner · 970 × 90</span>
     </div>
-    <p class="text-center text-[11px] font-mono text-faint dark:text-[#8E8E96] pb-4">Promoted placements are reviewed for medical-advertising compliance before publishing.</p>
+    <p class="text-center text-[11px] font-mono text-faint dark:text-[#8E8E96] pb-4">Promoted placements are reviewed for medical-advertising compliance before publishing. <a href="/advertising-policy/" data-legal="advertising-policy" class="underline underline-offset-4">Advertising policy</a></p>
   </div>
 
   <!-- ===================== FOOTER ===================== -->
@@ -1652,11 +1704,12 @@
       <div>
         <a href="/" class="inline-flex items-center gap-2.5">
           <span class="w-5 h-5 rounded-full grid place-items-center">
-            <img src="assets/logo.png" data-logo alt="logo" class="w-5 h-5">
+            <img src="assets/logo.png" data-logo alt="ViaDrug logo" class="w-5 h-5">
           </span>
           <span class="text-[15px] font-bold tracking-tight">ViaDrug</span>
         </a>
         <p class="mt-2 text-sm text-mute dark:text-[#9C9CA3]">One drug. Every layer of evidence, connected.</p>
+        <p lang="ar" dir="rtl" class="mt-2 text-sm text-mute dark:text-[#9C9CA3] max-w-md">ViaDrug مرجع علمي للأدوية في السوق المصري: ابحث بالاسم التجاري لتعرف المادة الفعّالة والبدائل والتداخلات الدوائية.</p>
         <a href="https://www.linkedin.com/in/amr-khaled-085851379" target="_blank" rel="noopener noreferrer"
            class="inline-flex items-center gap-1.5 text-[13px] font-semibold mt-3 border-b border-ink dark:border-snow pb-0.5 hover:opacity-60 transition-opacity">
           LinkedIn
@@ -1665,9 +1718,160 @@
           </svg>
         </a>
       </div>
-      <p class="text-[13px] font-mono text-mute dark:text-[#9C9CA3]">© 2026 ViaDrug</p>
+      <p class="text-[13px] font-mono text-mute dark:text-[#9C9CA3]">© 2026 ViaDrug · Amr Khaled Abdelkader. All rights reserved.</p>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 mt-8 pt-6 border-t border-hair dark:border-dhair">
+      <nav aria-label="Legal" class="flex flex-wrap gap-x-5 gap-y-1.5 text-[12px] text-mute dark:text-[#9C9CA3]">
+        <a href="/terms/" data-legal="terms" class="hover:text-ink dark:hover:text-snow transition-colors">Terms &amp; Conditions</a>
+        <a href="/privacy/" data-legal="privacy" class="hover:text-ink dark:hover:text-snow transition-colors">Privacy</a>
+        <a href="/disclaimer/" data-legal="disclaimer" class="hover:text-ink dark:hover:text-snow transition-colors">Medical Disclaimer</a>
+        <a href="/advertising-policy/" data-legal="advertising-policy" class="hover:text-ink dark:hover:text-snow transition-colors">Advertising Policy</a>
+        <a href="/data-sources/" data-legal="data-sources" class="hover:text-ink dark:hover:text-snow transition-colors">Data Sources</a>
+      </nav>
+      <p class="mt-4 text-[12px] leading-relaxed text-faint dark:text-[#8E8E96] max-w-3xl">ViaDrug is an educational and scientific reference, not medical advice. Always consult a doctor or pharmacist before using or changing any medicine.</p>
     </div>
   </footer>
+
+
+  <!-- ===================== LEGAL POPUP ===================== -->
+  <style>
+    #legal-dialog{padding:0;border:0;border-radius:24px;width:min(760px,100vw);max-width:100vw;height:min(86vh,860px);max-height:100dvh;background:#FAFAF9;color:#0A0A0A;box-shadow:0 30px 90px -20px rgba(0,0,0,.45);overflow:hidden}
+    #legal-dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(4px)}
+    .dark #legal-dialog{background:#0B0B0C;color:#FAFAFA}
+    #legal-dialog[open]{display:flex;flex-direction:column}
+    #legal-dialog[data-lang="en"] .ar{display:none!important}
+    #legal-dialog[data-lang="ar"] .en{display:none!important}
+    .lg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #E4E4E7}
+    .dark .lg-head{border-color:#1C1C1E}
+    .lg-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid #E4E4E7;scrollbar-width:none}
+    .lg-tabs::-webkit-scrollbar{display:none}
+    .dark .lg-tabs{border-color:#1C1C1E}
+    .lg-tab,.lg-btn{white-space:nowrap;border:1px solid #E4E4E7;background:transparent;color:inherit;border-radius:999px;padding:6px 13px;font:600 12.5px 'Inter','IBM Plex Sans Arabic',system-ui,sans-serif;cursor:pointer}
+    .dark .lg-tab,.dark .lg-btn{border-color:#1C1C1E}
+    .lg-tab[aria-selected="true"]{background:#0A0A0A;color:#FAFAFA;border-color:#0A0A0A}
+    .dark .lg-tab[aria-selected="true"]{background:#FAFAFA;color:#0A0A0A;border-color:#FAFAFA}
+    .lg-body{flex:1;overflow-y:auto;padding:8px 22px 40px;-webkit-overflow-scrolling:touch}
+    .lg-body .ar{font-family:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}
+    .lg-body h1{font-size:26px;line-height:1.2;letter-spacing:-.02em;font-weight:800;margin:22px 0 6px}
+    .lg-body h2{font-size:16px;font-weight:700;margin:26px 0 6px}
+    .lg-body p,.lg-body li{font-size:14.5px;line-height:1.75;margin:6px 0}
+    .lg-body ul{list-style:disc;padding-inline-start:22px;margin:8px 0}
+    .lg-body .meta{font:500 11.5px 'IBM Plex Mono',monospace;color:#71717A;margin:0 0 16px}
+    .lg-body .note{background:#F4F4F5;border:1px solid #E4E4E7;border-radius:14px;padding:14px 16px;margin:14px 0;font-weight:500;font-size:14.5px;line-height:1.7}
+    .dark .lg-body .note{background:#1C1C1E;border-color:#2A2A2D}
+    .lg-body a{text-decoration:underline;text-underline-offset:3px}
+    .lg-body .tablewrap{overflow-x:auto;border:1px solid #E4E4E7;border-radius:12px;margin:14px 0}
+    .dark .lg-body .tablewrap{border-color:#1C1C1E}
+    .lg-body table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+    .lg-body th,.lg-body td{padding:10px 12px;text-align:start;border-bottom:1px solid #E4E4E7;vertical-align:top}
+    .dark .lg-body th,.dark .lg-body td{border-color:#1C1C1E}
+    .lg-body th{background:#F4F4F5;font-weight:600}
+    .dark .lg-body th{background:#1C1C1E}
+    .lg-body tr:last-child td{border-bottom:0}
+    #terms-notice{position:fixed;left:12px;right:12px;bottom:12px;z-index:40;max-width:640px;margin:0 auto;display:none;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:18px;background:#0A0A0A;color:#FAFAFA;font-size:12.5px;line-height:1.5;box-shadow:0 12px 40px -10px rgba(0,0,0,.5)}
+    .dark #terms-notice{background:#FAFAFA;color:#0A0A0A}
+    #terms-notice a{text-decoration:underline;text-underline-offset:3px}
+    #terms-notice button{border:0;border-radius:999px;padding:6px 14px;font:600 12.5px 'Inter',system-ui,sans-serif;cursor:pointer;background:#FAFAFA;color:#0A0A0A}
+    .dark #terms-notice button{background:#0A0A0A;color:#FAFAFA}
+  </style>
+
+  <dialog id="legal-dialog" data-lang="en" aria-label="Terms and legal information">
+    <div class="lg-head">
+      <button type="button" class="lg-btn" id="lg-lang"><span class="en">عربي</span><span class="ar">English</span></button>
+      <button type="button" class="lg-btn" id="lg-close" aria-label="Close">✕</button>
+    </div>
+    <div class="lg-tabs" role="tablist">
+      <button type="button" class="lg-tab" role="tab" data-tab="terms"><span class="en">Terms &amp; Conditions</span><span class="ar">الشروط والأحكام</span></button>
+      <button type="button" class="lg-tab" role="tab" data-tab="privacy"><span class="en">Privacy</span><span class="ar">الخصوصية</span></button>
+      <button type="button" class="lg-tab" role="tab" data-tab="disclaimer"><span class="en">Medical Disclaimer</span><span class="ar">إخلاء المسؤولية الطبي</span></button>
+      <button type="button" class="lg-tab" role="tab" data-tab="advertising-policy"><span class="en">Advertising</span><span class="ar">الإعلانات</span></button>
+      <button type="button" class="lg-tab" role="tab" data-tab="data-sources"><span class="en">Data Sources</span><span class="ar">مصادر البيانات</span></button>
+    </div>
+    <div class="lg-body" id="lg-body"></div>
+  </dialog>
+
+  <div id="terms-notice" role="region" aria-label="Terms notice">
+    <span>By using ViaDrug you agree to our <a href="/terms/" data-legal="terms">Terms &amp; Conditions</a>. · باستخدامك الموقع فأنت توافق على الشروط والأحكام.</span>
+    <button type="button" id="terms-ok">OK · موافق</button>
+  </div>
+
+  <script>
+  (function () {
+    var dlg = document.getElementById('legal-dialog');
+    var body = document.getElementById('lg-body');
+    var cache = {};
+    var current = 'terms';
+
+    function getLang() {
+      try {
+        return localStorage.getItem('viadrug-lang') ||
+          ((navigator.language || '').toLowerCase().indexOf('ar') === 0 ? 'ar' : 'en');
+      } catch (e) { return 'en'; }
+    }
+    function setLang(l) {
+      dlg.setAttribute('data-lang', l);
+      try { localStorage.setItem('viadrug-lang', l); } catch (e) {}
+    }
+    function markTab(slug) {
+      dlg.querySelectorAll('.lg-tab').forEach(function (t) {
+        t.setAttribute('aria-selected', t.getAttribute('data-tab') === slug ? 'true' : 'false');
+      });
+    }
+    function show(slug) {
+      current = slug; markTab(slug);
+      if (cache[slug]) { body.innerHTML = cache[slug]; body.scrollTop = 0; return; }
+      body.innerHTML = '<p style="padding:24px 0;opacity:.6">Loading… / جارٍ التحميل…</p>';
+      fetch('/' + slug + '/', { credentials: 'same-origin' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then(function (html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var main = doc.querySelector('main');
+          if (!main) throw new Error('no main');
+          cache[slug] = main.innerHTML;
+          if (current === slug) { body.innerHTML = cache[slug]; body.scrollTop = 0; }
+        })
+        .catch(function () {
+          body.innerHTML = '<p style="padding:24px 0">Could not load this page. <a href="/' + slug + '/" target="_blank" rel="noopener">Open it in a new tab</a>.<br>تعذّر تحميل الصفحة. <a href="/' + slug + '/" target="_blank" rel="noopener">افتحها في تبويب جديد</a>.</p>';
+        });
+    }
+    function openLegal(slug) {
+      setLang(getLang());
+      if (!dlg.open) { dlg.showModal(); document.documentElement.style.overflow = 'hidden'; }
+      show(slug || 'terms');
+    }
+    var legalSlugs = ['terms', 'privacy', 'disclaimer', 'advertising-policy', 'data-sources'];
+
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a) return;
+      var slug = a.getAttribute('data-legal');
+      if (!slug) {
+        var m = a.getAttribute('href').match(/^\/([a-z-]+)\/?$/);
+        if (m && legalSlugs.indexOf(m[1]) > -1 && dlg.contains(a)) slug = m[1];
+      }
+      if (slug && !(e.metaKey || e.ctrlKey || e.shiftKey)) { e.preventDefault(); openLegal(slug); }
+    });
+    dlg.querySelectorAll('.lg-tab').forEach(function (t) {
+      t.addEventListener('click', function () { show(t.getAttribute('data-tab')); });
+    });
+    document.getElementById('lg-close').addEventListener('click', function () { dlg.close(); });
+    document.getElementById('lg-lang').addEventListener('click', function () {
+      setLang(dlg.getAttribute('data-lang') === 'ar' ? 'en' : 'ar');
+    });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', function () { document.documentElement.style.overflow = ''; });
+
+    // First-visit notice: entering the site = agreeing to the terms.
+    var notice = document.getElementById('terms-notice');
+    var acked = false;
+    try { acked = localStorage.getItem('viadrug-terms-ack') === '1'; } catch (e) {}
+    if (!acked) notice.style.display = 'flex';
+    document.getElementById('terms-ok').addEventListener('click', function () {
+      notice.style.display = 'none';
+      try { localStorage.setItem('viadrug-terms-ack', '1'); } catch (e) {}
+    });
+  })();
+  </script>
 
 </body>
 </html>
