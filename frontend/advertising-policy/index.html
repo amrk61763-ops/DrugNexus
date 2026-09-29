@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Advertising Policy — ViaDrug</title>
+<meta name="description" content="How advertising works on ViaDrug: clearly labeled, editorially independent and reviewed for medical-advertising compliance.">
+<link rel="canonical" href="https://viadrug.app/advertising-policy/">
+<link rel="icon" href="/assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0A0A0A;--paper:#FAFAF9;--mute:#71717A;--hair:#E4E4E7;--card:#FFFFFF;--note:#F4F4F5}
+html.dark{--ink:#FAFAFA;--paper:#000;--mute:#9C9CA3;--hair:#1C1C1E;--card:#0B0B0C;--note:#1C1C1E}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter','IBM Plex Sans Arabic',system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.ar{font-family:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}
+html[data-lang="en"] .ar{display:none!important}
+html[data-lang="ar"] .en{display:none!important}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--hair)}
+.bar{max-width:760px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;color:var(--ink);text-decoration:none}
+.brand img{width:20px;height:20px}
+.tools{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--hair);background:transparent;color:var(--ink);border-radius:999px;padding:6px 14px;font:600 13px inherit;font-family:inherit;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--ink)}
+main{max-width:760px;margin:0 auto;padding:40px 20px 72px}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.15;letter-spacing:-.03em;margin:0 0 8px;font-weight:800}
+h2{font-size:18px;margin:34px 0 8px;letter-spacing:-.01em}
+p,li{font-size:15px;color:var(--ink)}
+li{margin:4px 0}
+.meta{font:500 12px 'IBM Plex Mono',monospace;color:var(--mute);margin:0 0 24px;letter-spacing:.04em}
+.note{background:var(--note);border:1px solid var(--hair);border-radius:16px;padding:16px 18px;margin:20px 0;font-weight:500}
+a{color:var(--ink);text-underline-offset:3px}
+.tablewrap{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;margin:16px 0}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{padding:12px 14px;text-align:start;border-bottom:1px solid var(--hair);vertical-align:top}
+th{background:var(--note);font-weight:600}
+tr:last-child td{border-bottom:0}
+footer{border-top:1px solid var(--hair);padding:28px 20px 40px}
+.fwrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.flinks{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
+.flinks a{color:var(--mute);text-decoration:none}
+.flinks a:hover{color:var(--ink)}
+.copy{font:12px 'IBM Plex Mono',monospace;color:var(--mute)}
+</style>
+<script>
+(function(){
+  var dark, lang;
+  try{
+    var s=localStorage.getItem('viadrug-theme');
+    dark = s ? s==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    lang = localStorage.getItem('viadrug-lang') || ((navigator.language||'').toLowerCase().indexOf('ar')===0 ? 'ar' : 'en');
+  }catch(e){ dark=false; lang='en'; }
+  var h=document.documentElement;
+  h.classList.toggle('dark',dark); h.style.colorScheme=dark?'dark':'light';
+  h.setAttribute('data-lang',lang); h.lang=lang;
+  window.addEventListener('DOMContentLoaded',function(){ swapLogo(dark); });
+})();
+function swapLogo(d){document.querySelectorAll('img[data-logo]').forEach(function(i){i.src=d?'/assets/logo-white.png':'/assets/logo.png';});}
+function toggleTheme(){var h=document.documentElement,d=!h.classList.contains('dark');h.classList.toggle('dark',d);h.style.colorScheme=d?'dark':'light';swapLogo(d);try{localStorage.setItem('viadrug-theme',d?'dark':'light');}catch(e){}}
+function toggleLang(){var h=document.documentElement,l=h.getAttribute('data-lang')==='ar'?'en':'ar';h.setAttribute('data-lang',l);h.lang=l;try{localStorage.setItem('viadrug-lang',l);}catch(e){}}
+</script>
+</head>
+<body>
+<header><div class="bar">
+  <a class="brand" href="/"><img src="/assets/logo.png" data-logo alt="ViaDrug logo"><span>ViaDrug</span></a>
+  <div class="tools">
+    <button class="btn" type="button" onclick="toggleLang()"><span class="en ar-font">عربي</span><span class="ar">English</span></button>
+    <button class="btn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode">◐</button>
+  </div>
+</div></header>
+<main>
+<section class="en" lang="en">
+<h1>Advertising Policy</h1>
+<p class="meta">Last updated: September 29, 2026</p>
+
+<div class="note">Advertising never changes the scientific information, search results or ordering on ViaDrug.</div>
+<h2>1. Clear labeling</h2>
+<p>Advertisements appear only in the dedicated advertising areas of the website, labeled "Advertisement" and clearly separated from scientific content. We aim to show advertisements related to pharmacy and healthcare.</p>
+<h2>2. Editorial independence</h2>
+<p>Advertisers cannot pay to change, remove or promote any scientific content, ranking or result. Advertising does not mean we endorse a product or service.</p>
+<h2>3. What we do not accept</h2>
+<ul>
+<li>Advertisements promoting prescription-only medicines to the general public.</li>
+<li>Misleading, exaggerated or unsubstantiated health claims, including claims of cure.</li>
+<li>Unregistered, counterfeit or unlawful products or services.</li>
+<li>Advertisements that target children with medicines or health products.</li>
+</ul>
+<h2>4. Compliance</h2>
+<p>Advertisers are responsible for complying with the Egyptian laws and regulations that govern advertising of health products. We may ask for proof of registration or approval before publishing, and we may refuse or remove any advertisement at our discretion.</p>
+<h2>5. Privacy</h2>
+<p>Advertising partners may use technologies that process technical data. We will describe them in our <a href="/privacy/">Privacy Policy</a> and request consent where required before activating them.</p>
+<h2>6. Report an advertisement</h2>
+<p>If you see an advertisement that breaks this policy, write to <a href="mailto:amr63761763@gmail.com">amr63761763@gmail.com</a> with a description or a screenshot, and we will review it.</p>
+
+</section>
+<section class="ar" lang="ar" dir="rtl">
+<h1>سياسة الإعلانات</h1>
+<p class="meta">آخر تحديث: 29 سبتمبر 2026</p>
+
+<div class="note">الإعلانات لا تغيّر أبدًا المعلومات العلمية أو نتائج البحث أو ترتيبها على ViaDrug.</div>
+<h2>1. وضوح التمييز</h2>
+<p>تظهر الإعلانات فقط في المناطق الإعلانية المخصصة في الموقع، موسومة بكلمة "إعلان" ومنفصلة بوضوح عن المحتوى العلمي. ونسعى إلى عرض إعلانات متعلقة بمجال الصيدلة والرعاية الصحية.</p>
+<h2>2. الاستقلال التحريري</h2>
+<p>لا يستطيع المعلنون الدفع لتغيير أي محتوى علمي أو ترتيب أو نتيجة أو حذفها أو الترويج لها. ووجود الإعلان لا يعني أننا نزكّي المنتج أو الخدمة.</p>
+<h2>3. ما لا نقبله</h2>
+<ul>
+<li>الإعلانات التي تروّج للأدوية التي تُصرف بوصفة طبية فقط للجمهور العام.</li>
+<li>الادعاءات الصحية المضللة أو المبالغ فيها أو غير المثبتة، ومنها ادعاءات الشفاء.</li>
+<li>المنتجات أو الخدمات غير المسجلة أو المغشوشة أو المخالفة للقانون.</li>
+<li>الإعلانات التي تستهدف الأطفال بالأدوية أو المنتجات الصحية.</li>
+</ul>
+<h2>4. الالتزام بالقوانين</h2>
+<p>يتحمل المعلنون مسؤولية الالتزام بالقوانين واللوائح المصرية المنظمة لإعلانات المنتجات الصحية. وقد نطلب إثبات التسجيل أو الموافقة قبل النشر، ويحق لنا رفض أي إعلان أو إزالته وفق تقديرنا.</p>
+<h2>5. الخصوصية</h2>
+<p>قد يستخدم شركاء الإعلان تقنيات تعالج بيانات تقنية. سنوضحها في <a href="/privacy/">سياسة الخصوصية</a> ونطلب موافقتك عند اللزوم قبل تفعيلها.</p>
+<h2>6. الإبلاغ عن إعلان</h2>
+<p>إذا رأيت إعلانًا يخالف هذه السياسة فراسلنا على <a href="mailto:amr63761763@gmail.com">amr63761763@gmail.com</a> مع وصف أو لقطة شاشة وسنراجعه.</p>
+
+</section>
+</main>
+<footer><div class="fwrap">
+  <nav class="flinks" aria-label="Legal"><a href="/disclaimer/"><span class="en">Medical Disclaimer</span><span class="ar">إخلاء المسؤولية الطبي</span></a><a href="/privacy/"><span class="en">Privacy Policy</span><span class="ar">سياسة الخصوصية</span></a><a href="/terms/"><span class="en">Terms of Use</span><span class="ar">شروط الاستخدام</span></a><a href="/advertising-policy/"><span class="en">Advertising Policy</span><span class="ar">سياسة الإعلانات</span></a><a href="/data-sources/"><span class="en">Data Sources</span><span class="ar">مصادر البيانات</span></a></nav>
+  <p class="copy">© 2026 ViaDrug</p>
+</div></footer>
+</body>
+</html>
