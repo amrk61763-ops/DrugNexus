@@ -30,11 +30,13 @@ class IngredientSummary(BaseModel):
 class AlternativeDrug(BaseModel):
     """دواء تاني عنده بالظبط نفس مجموعة المواد الفعالة (مش بس مادة
     مشتركة واحدة)."""
+    id: int
     trade_name: str
     manufacturer: str
 
 
 class TradeNameResponse(BaseModel):
+    id: int
     trade_name: str
     manufacturer: str
     drug_class: str
@@ -45,5 +47,6 @@ class TradeNameResponse(BaseModel):
 class TradeNameSearchResult(BaseModel):
     """نتيجة خفيفة لاقتراحات البحث اللحظية - من غير ingredients ولا
     alternatives عشان تكون سريعة جدًا."""
+    id: int
     trade_name: str
     manufacturer: str
