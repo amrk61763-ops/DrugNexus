@@ -1454,7 +1454,16 @@
             console.error('Trade name search failed:', err);
             this.tradeResults = [];
           }
-          if (this.tradeResults.length === 1) this.setDrug(this.tradeResults[0]);
+          if (this.tradeResults.length === 1) {
+            const only = this.tradeResults[0];
+            if (only.id) {
+              this.tradeLoading = false;
+              const url = '/drug/' + only.id + '/' + this.drugSlug(only.trade_name);
+              window.location[this._fromUrl ? 'replace' : 'assign'](url);
+              return;
+            }
+            this.setDrug(only);
+          }
           this.tradeLoading = false;
         },
 
@@ -1690,6 +1699,7 @@
           } else {
             this.mode = 'trade';
             this.tradeQuery = q;
+            this._fromUrl = true;
             this.searchTrade();
           }
         },
