@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from . import active_ingredient, drug_page, trade_name
+from . import active_ingredient, trade_name
 
 
 app = FastAPI(
@@ -24,7 +24,6 @@ app.add_middleware(
 
 app.include_router(trade_name.router)
 app.include_router(active_ingredient.router)
-app.include_router(drug_page.router)  # /drug/{id}/{slug} + /sitemap.xml
 
 
 @app.get("/health")

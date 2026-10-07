@@ -160,7 +160,7 @@ async def _batch_alternatives(db: AsyncSession, drug_ids: list[int]) -> dict[int
                 continue
             if list(row["cids"]) == target_cids:
                 by_drug[drug_id].append(
-                    AlternativeDrug(id=row["drug_id"], trade_name=row["trade_name"], manufacturer=row["manufacturer"])
+                    AlternativeDrug(trade_name=row["trade_name"], manufacturer=row["manufacturer"])
                 )
     return by_drug
 
@@ -218,7 +218,6 @@ async def search_by_trade_name(
             ]
             responses.append(
                 TradeNameResponse(
-                    id=drug.id,
                     trade_name=drug.trade_name,
                     manufacturer=drug.manufacturer,
                     drug_class=drug.drug_class,
