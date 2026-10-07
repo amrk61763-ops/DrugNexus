@@ -44,13 +44,17 @@ async def search_suggest(q: str, db: AsyncSession = Depends(get_db)):
     if len(q) < 2:
         return []
     result = await db.execute(
-        select(Drug.trade_name, Drug.manufacturer)
+        select(Drug.id, Drug.trade_name, Drug.manufacturer)
         .where(Drug.trade_name.ilike(f"%{q}%"))
         .order_by(Drug.trade_name)
         .limit(10)
     )
     return [
-        TradeNameSearchResult(trade_name=row.trade_name, manufacturer=row.manufacturer)
+        TradeNameSearchResult(
+            id=row.id,
+            trade_name=row.trade_name,
+            manufacturer=row.manufacturer,
+        )
         for row in result.all()
     ]
 
@@ -160,7 +164,11 @@ async def _batch_alternatives(db: AsyncSession, drug_ids: list[int]) -> dict[int
                 continue
             if list(row["cids"]) == target_cids:
                 by_drug[drug_id].append(
-                    AlternativeDrug(trade_name=row["trade_name"], manufacturer=row["manufacturer"])
+                    AlternativeDrug(
+                        id=cand_id,
+                        trade_name=row["trade_name"],
+                        manufacturer=row["manufacturer"],
+                    )
                 )
     return by_drug
 
@@ -218,6 +226,7 @@ async def search_by_trade_name(
             ]
             responses.append(
                 TradeNameResponse(
+                    id=drug.id,
                     trade_name=drug.trade_name,
                     manufacturer=drug.manufacturer,
                     drug_class=drug.drug_class,
