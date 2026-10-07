@@ -1,6 +1,7 @@
 import os
+import urllib.request
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -31,6 +32,25 @@ async def health():
     return {
         "status": "healthy",
     }
+
+
+# Proxies PubChem structure images through our own domain so the browser
+# never has to hit PubChem directly (avoids CSP / referrer / throttling issues).
+@app.get("/structure/{cid}")
+def structure(cid: int):
+    url = f"https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid={cid}&t=l"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "ViaDrug/1.0"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = r.read()
+            ctype = r.headers.get("Content-Type", "image/png")
+    except Exception:
+        raise HTTPException(status_code=502, detail="PubChem unavailable")
+    return Response(
+        content=data,
+        media_type=ctype,
+        headers={"Cache-Control": "public, max-age=2592000, s-maxage=2592000"},
+    )
 
 
 # Serves the frontend (index.html and friends) at "/" and any non-API path.
