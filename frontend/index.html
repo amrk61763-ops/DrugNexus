@@ -547,10 +547,10 @@
                 <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-faint dark:text-[#8E8E96]" x-text="'&quot;' + tradeQuery + '&quot;'"></span>
               </div>
               <div class="border border-hair dark:border-dhair rounded-3xl overflow-hidden divide-y divide-hair dark:divide-dhair">
-                <template x-for="(r, idx) in tradeResults" :key="r.trade_name">
-                  <button type="button" @click="setDrug(r)"
-                          class="group w-full text-left bg-paper dark:bg-coal px-6 sm:px-8 py-5 hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] transition-colors
-                                 flex items-center gap-5 sm:gap-8">
+                <template x-for="(r, idx) in tradeResults" :key="r.id">
+                  <a :href="'/drug/' + r.id + '/' + drugSlug(r.trade_name)"
+                     class="group w-full text-left bg-paper dark:bg-coal px-6 sm:px-8 py-5 hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] transition-colors
+                            flex items-center gap-5 sm:gap-8">
                     <span class="font-mono text-sm text-faint dark:text-[#8E8E96] w-8 shrink-0" x-text="String(idx + 1).padStart(2, '0')"></span>
                     <span class="flex-1 min-w-0">
                       <span class="block text-lg font-bold tracking-tight truncate" x-text="r.trade_name"></span>
@@ -561,7 +561,7 @@
                     </span>
                     <span class="hidden sm:block shrink-0 font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-ink dark:bg-snow text-paper dark:text-coal" x-text="(r.active_ingredients || []).length + ' ingredients'"></span>
                     <svg class="w-4 h-4 shrink-0 text-mute dark:text-[#9C9CA3] transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 17L17 7M9 7h8v8"/></svg>
-                  </button>
+                  </a>
                 </template>
               </div>
             </div>
@@ -718,14 +718,13 @@
                           <div x-show="openAltGroups.includes(group.key)" x-cloak
                                class="border-t border-hair dark:border-dhair divide-y divide-hair dark:divide-dhair">
 
-                            <template x-for="alt in group.items" :key="alt.trade_name + (alt.manufacturer || '')">
-                              <button type="button"
-                                      @click="tradeQuery = alt.trade_name; searchTrade();"
-                                      class="w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
+                            <template x-for="alt in group.items" :key="alt.id">
+                              <a :href="'/drug/' + alt.id + '/' + drugSlug(alt.trade_name)"
+                                 class="block w-full text-left p-4 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors">
                                 <span class="font-semibold text-sm block truncate" x-text="alt.trade_name"></span>
                                 <p class="mt-0.5 text-xs text-mute dark:text-[#9C9CA3] truncate"
                                    x-text="alt.manufacturer || 'Unknown manufacturer'"></p>
-                              </button>
+                              </a>
                             </template>
                           </div>
                         </div>
@@ -1279,6 +1278,17 @@
           const firstWord = name.split(/[\s\-]+/)[0];
           return firstWord || name || 'unknown';
         },
+
+        // Must stay in sync with backend make_slug() so drug URLs are stable.
+        drugSlug(value) {
+          return String(value || '')
+            .normalize('NFKD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '') || 'drug';
+        },
+
         groupByGeneric(list, limit) {
           const order = [];
           const groups = {};
