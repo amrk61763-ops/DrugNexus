@@ -1,15 +1,10 @@
-import html
 import os
 
-from fastapi import Depends, FastAPI, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from . import active_ingredient, trade_name
-from .database import get_db
-from .models import Drug
+from . import active_ingredient, drug_page, trade_name
 
 
 app = FastAPI(
@@ -28,8 +23,8 @@ app.add_middleware(
 
 
 app.include_router(trade_name.router)
-app.include_router(trade_name.drug_router)
 app.include_router(active_ingredient.router)
+app.include_router(drug_page.router)  # /drug/{id}/{slug} + /sitemap.xml
 
 
 @app.get("/health")
@@ -37,35 +32,6 @@ async def health():
     return {
         "status": "healthy",
     }
-
-
-@app.get("/sitemap-drugs.xml", include_in_schema=False)
-async def sitemap_drugs(db: AsyncSession = Depends(get_db)):
-    """Generate the complete drug sitemap from the live database."""
-    result = await db.execute(
-        select(Drug.id, Drug.trade_name).order_by(Drug.id)
-    )
-    drugs = result.all()
-
-    site_url = os.getenv("SITE_URL", "https://viadrug.app").rstrip("/")
-    lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-        f"  <url><loc>{html.escape(site_url + '/', quote=False)}</loc></url>",
-        f"  <url><loc>{html.escape(site_url + '/data-sources/', quote=False)}</loc></url>",
-        f"  <url><loc>{html.escape(site_url + '/disclaimer/', quote=False)}</loc></url>",
-        f"  <url><loc>{html.escape(site_url + '/privacy/', quote=False)}</loc></url>",
-        f"  <url><loc>{html.escape(site_url + '/terms/', quote=False)}</loc></url>",
-        f"  <url><loc>{html.escape(site_url + '/advertising-policy/', quote=False)}</loc></url>",
-    ]
-
-    for drug_id, trade_name_value in drugs:
-        slug = trade_name.make_slug(trade_name_value)
-        url = f"{site_url}/drug/{drug_id}/{slug}"
-        lines.append(f"  <url><loc>{html.escape(url, quote=False)}</loc></url>")
-
-    lines.append("</urlset>")
-    return Response(content="\n".join(lines), media_type="application/xml")
 
 
 # Serves the frontend (index.html and friends) at "/" and any non-API path.
