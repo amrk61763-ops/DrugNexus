@@ -1,4 +1,4 @@
-# DrugNexus
+# ViaDrug
 
 > A scientific drug information platform connecting pharmaceutical products in the Egyptian market with active ingredients, chemical information, and structural data.
 
@@ -11,16 +11,16 @@
 ## Live Demo
 
 **Website:**  
-https://drugnexus.vercel.app/
+https://viadrug.app/
 
 **Interactive API Documentation:**  
-https://drugnexus.vercel.app/docs
+https://viadrug.app/docs
 
 ---
 
 ## Overview
 
-DrugNexus is a pharmaceutical and scientific information platform developed around the Egyptian pharmaceutical market.
+ViaDrug is a pharmaceutical and scientific information platform developed around the Egyptian pharmaceutical market.
 
 The project connects pharmaceutical trade names with their active ingredients and extends those relationships into scientific and structural information.
 
@@ -32,11 +32,11 @@ The first version was built as a practical exploration of how pharmaceutical kno
 
 ---
 
-## What DrugNexus Does
+## What Viadrug Does
 
 ### Pharmaceutical Search
 
-DrugNexus provides search capabilities for pharmaceutical products using their trade names and active ingredients.
+Viadrug provides search capabilities for pharmaceutical products using their trade names and active ingredients.
 
 Users can move between a pharmaceutical product and the active ingredient associated with it.
 
@@ -60,7 +60,7 @@ Depending on the available data, information may include:
 
 ### Structural Information
 
-DrugNexus extends the pharmaceutical information layer into structural biology.
+ViaDrug extends the pharmaceutical information layer into structural biology.
 
 Where relevant structural data is available, active ingredients can be associated with Protein Data Bank (PDB) structures, receptors, and ligands.
 
@@ -83,13 +83,13 @@ The production database is not included in this repository.
 
 ## Scientific Data Sources
 
-DrugNexus connects information from external scientific resources, including:
+ViaDrug connects information from external scientific resources, including:
 
 - **PubChem**
 - **ChEMBL**
 - **Protein Data Bank (PDB)**
 
-DrugNexus acts as an organization and discovery layer around relevant information.
+ViaDrug acts as an organization and discovery layer around relevant information.
 
 It does not replace the original scientific databases.
 
