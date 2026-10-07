@@ -11,6 +11,7 @@
     gtag('config', 'GT-MQP3XHTN');
   </script>
   <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
   <title>ViaDrug — Egyptian Drug Database: Trade Names &amp; Active Ingredients</title>
@@ -631,7 +632,7 @@
                         </div>
                         <div class="sm:col-span-2">
                           <div class="border border-hair dark:border-dhair rounded-2xl p-3 h-40 flex items-center justify-center overflow-hidden bg-white">
-                            <img :src="'/structure/' + ai.pubchem_cid"
+                            <img :src="'https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=' + ai.pubchem_cid + '&t=l'"
                                  :alt="'Structure of ' + ai.display_name" class="max-h-full w-auto object-contain" loading="lazy" />
                           </div>
                           <p class="mt-2 text-[11px] font-mono text-mute dark:text-[#9C9CA3] text-center">Source: PubChem</p>
@@ -866,7 +867,7 @@
                       </div>
                       <div class="sm:col-span-2">
                         <div class="border border-hair dark:border-dhair rounded-2xl p-3 h-44 flex items-center justify-center overflow-hidden bg-white">
-                          <img :src="'/structure/' + ing.pubchem_cid"
+                          <img :src="'https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=' + ing.pubchem_cid + '&t=l'"
                                :alt="ing.display_name + ' structure'" class="max-h-full w-auto object-contain" loading="lazy" />
                         </div>
                         <p class="mt-2 text-[11px] font-mono text-mute dark:text-[#9C9CA3] text-center">Source: PubChem</p>
