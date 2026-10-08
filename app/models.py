@@ -8,9 +8,10 @@
 مباشرة (python3 models.py) وهيطبعلك أسماء الأعمدة اللي قرأها.
 """
 
+from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -114,8 +115,10 @@ class PdbLigand(Base):
     ligand_file_name: Mapped[str] = mapped_column(primary_key=True)
     # ligand resolution may be textual (keep str | None)
     resolution: Mapped[str | None] = mapped_column()
-    rsr: Mapped[int | None] = mapped_column()
-    rscc: Mapped[int | None] = mapped_column()
+    # RSR / RSCC أعمدة numeric في القاعدة (مثلاً 0.133 و 0.966) - لازم تتعرّف
+    # كـNumeric/Decimal مش int، وإلا أي كسر بيتحول لـ0 في الواجهة.
+    rsr: Mapped[Decimal | None] = mapped_column(Numeric)
+    rscc: Mapped[Decimal | None] = mapped_column(Numeric)
     atom_count: Mapped[int | None] = mapped_column()
     ligand_blob_pathname: Mapped[str] = mapped_column()
     ligand_blob_url: Mapped[str | None] = mapped_column()

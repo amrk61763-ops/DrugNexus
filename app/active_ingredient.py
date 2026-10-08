@@ -42,6 +42,18 @@ def _to_int(val):
         return None
 
 
+def _to_float(val):
+    """للقيم الكسرية زي RSR/RSCC (numeric في القاعدة). مهم: مش int() لأن
+    int(0.966) = 0 وده كان سبب ظهور الصفر في الواجهة. None بتفضل None
+    عشان الواجهة تعرض N/A بدل 0."""
+    try:
+        if val is None:
+            return None
+        return float(val)
+    except (TypeError, ValueError):
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Lightweight live-suggestion endpoint - MUST be defined before "/{display_name}"
 # ---------------------------------------------------------------------------
@@ -187,8 +199,8 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
                     LigandFile(
                         ligand_file_name=l.ligand_file_name,
                         resolution=str(getattr(l, "resolution")) if getattr(l, "resolution", None) is not None else None,
-                        rsr=_to_int(getattr(l, "rsr", None)),
-                        rscc=_to_int(getattr(l, "rscc", None)),
+                        rsr=_to_float(getattr(l, "rsr", None)),
+                        rscc=_to_float(getattr(l, "rscc", None)),
                         atom_count=_to_int(getattr(l, "atom_count", None)),
                         download_url=getattr(l, "ligand_blob_url", None),
                     )
