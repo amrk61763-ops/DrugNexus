@@ -26,8 +26,8 @@ class DrugInteraction(BaseModel):
 class LigandFile(BaseModel):
     ligand_file_name: str
     resolution: str | None
-    rsr: int | None
-    rscc: int | None
+    rsr: float | None
+    rscc: float | None
     atom_count: int | None
     download_url: str | None
 
