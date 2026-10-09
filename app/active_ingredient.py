@@ -15,14 +15,12 @@ from .models import (
     DrugIngredient,
     Ingredient,
     IngredientDetail,
-    PdbLigand,
     PdbReceptor,
 )
 from .schemas.active_ingredient import (
     ActiveIngredientResponse,
     DrugInteraction,
     IngredientSearchResult,
-    LigandFile,
     ReceptorStructure,
     TradeNameUsingIngredient,
 )
@@ -38,18 +36,6 @@ def _to_int(val):
         if val is None:
             return None
         return int(val)
-    except (TypeError, ValueError):
-        return None
-
-
-def _to_float(val):
-    """للقيم الكسرية زي RSR/RSCC (numeric في القاعدة). مهم: مش int() لأن
-    int(0.966) = 0 وده كان سبب ظهور الصفر في الواجهة. None بتفضل None
-    عشان الواجهة تعرض N/A بدل 0."""
-    try:
-        if val is None:
-            return None
-        return float(val)
     except (TypeError, ValueError):
         return None
 
@@ -172,43 +158,18 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         )
         receptors = result.scalars().all()
 
-    pdb_structures: list[ReceptorStructure] = []
-
-    if receptors:
-        receptor_pdb_ids = [r.pdb_id for r in receptors]
-
-        # استعلام واحد لكل الـligands بتوع كل الـreceptors مع بعض
-        # (بدل استعلام منفصل لكل receptor - نفس فلسفة trade_name.py)
-        result = await db.execute(
-            select(PdbLigand).where(PdbLigand.pdb_id.in_(receptor_pdb_ids))
+    # الـligands مش بتتجاب خالص دلوقتي (مرتبطة بالـdocking، مش بالمعلومات).
+    # الـreceptors بس هي اللي بترجع.
+    pdb_structures: list[ReceptorStructure] = [
+        ReceptorStructure(
+            pdb_id=r.pdb_id,
+            receptor_file_name=r.receptor_file_name,
+            resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
+            experiment_method=getattr(r, "experiment_method", None),
+            download_url=getattr(r, "receptor_blob_url", None),
         )
-        all_ligands = result.scalars().all()
-
-        ligands_by_pdb_id: dict[str, list[PdbLigand]] = {}
-        for lig in all_ligands:
-            ligands_by_pdb_id.setdefault(lig.pdb_id, []).append(lig)
-
-        pdb_structures = [
-            ReceptorStructure(
-                pdb_id=r.pdb_id,
-                receptor_file_name=r.receptor_file_name,
-                resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
-                experiment_method=getattr(r, "experiment_method", None),
-                download_url=getattr(r, "receptor_blob_url", None),
-                ligands=[
-                    LigandFile(
-                        ligand_file_name=l.ligand_file_name,
-                        resolution=str(getattr(l, "resolution")) if getattr(l, "resolution", None) is not None else None,
-                        rsr=_to_float(getattr(l, "rsr", None)),
-                        rscc=_to_float(getattr(l, "rscc", None)),
-                        atom_count=_to_int(getattr(l, "atom_count", None)),
-                        download_url=getattr(l, "ligand_blob_url", None),
-                    )
-                    for l in ligands_by_pdb_id.get(r.pdb_id, [])
-                ],
-            )
-            for r in receptors
-        ]
+        for r in receptors
+    ]
 
     # 6. Process drugs to extract the base name (prefix) and remove duplicates
     # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
