@@ -158,18 +158,19 @@ async def get_by_display_name(display_name: str, db: AsyncSession = Depends(get_
         )
         receptors = result.scalars().all()
 
-    # الـligands مش بتتجاب خالص دلوقتي (مرتبطة بالـdocking، مش بالمعلومات).
-    # الـreceptors بس هي اللي بترجع.
-    pdb_structures: list[ReceptorStructure] = [
-        ReceptorStructure(
-            pdb_id=r.pdb_id,
-            receptor_file_name=r.receptor_file_name,
-            resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
-            experiment_method=getattr(r, "experiment_method", None),
-            download_url=getattr(r, "receptor_blob_url", None),
-        )
-        for r in receptors
-    ]
+    pdb_structures: list[ReceptorStructure] = []
+
+    if receptors:
+        pdb_structures = [
+            ReceptorStructure(
+                pdb_id=r.pdb_id,
+                receptor_file_name=r.receptor_file_name,
+                resolution=str(getattr(r, "resolution")) if getattr(r, "resolution", None) is not None else None,
+                experiment_method=getattr(r, "experiment_method", None),
+                download_url=getattr(r, "receptor_blob_url", None),
+            )
+            for r in receptors
+        ]
 
     # 6. Process drugs to extract the base name (prefix) and remove duplicates
     # Example: "Augmentin 1g" -> "Augmentin", "Augmentin 360ml" -> "Augmentin"
