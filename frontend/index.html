@@ -382,17 +382,17 @@
           <p class="mt-2.5 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">Download cleaned, ready-to-dock receptor structure files for molecular docking.</p>
         </div>
         <div class="md:col-span-4 bg-paper dark:bg-coal p-8">
-          <h3 class="text-lg font-bold">Ligand Files</h3>
-          <p class="mt-2.5 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">Extracted ligands ranked by resolution, RSR and RSCC — prepared PDB/PDBQT files.</p>
+          <h3 class="text-lg font-bold">active ingredients</h3>
+          <p class="mt-2.5 text-sm text-mute dark:text-[#9C9CA3] leading-relaxed">There are over 1700 active ingredients to explore further..</p>
         </div>
         <div class="md:col-span-12 bg-paper dark:bg-coal relative min-h-[300px] overflow-hidden group">
           <img src="assets/lab-vintage.jpg" alt="Vintage pharmaceutical laboratory" class="absolute inset-0 w-full h-full object-cover object-center opacity-90 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.02]" loading="lazy" />
           <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-transparent"></div>
           <div class="absolute top-1/2 -translate-y-1/2 left-4 right-4 sm:right-auto sm:max-w-md bg-paper dark:bg-coal backdrop-blur-2xl rounded-2xl p-6 border border-hair dark:border-dhair shadow-[0_16px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.9)]">
             <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#000000] dark:text-[#FAFAF9] mb-2">Feature — 02</p>
-            <h3 class="text-2xl font-bold text-[#000000] dark:text-[#FAFAF9] tracking-tight">Structural Evidence</h3>
-            <p class="mt-2 text-sm text-[#000000] dark:text-[#FAFAF9] leading-relaxed">Every claim is anchored to a structure — receptor PDBs from RCSB, ligands validated by crystallographic metrics.</p>
-          </div>
+            <h3 class="text-2xl font-bold text-[#000000] dark:text-[#FAFAF9] tracking-tight">3D View Protein</h3>
+            <p class="mt-2 text-sm text-[#000000] dark:text-[#FAFAF9] leading-relaxed">A 3D view of the protein to show where the ligand binds to the protein..</p>
+          </div>3D View Protein
         </div>
       </div>
     </div>
@@ -793,7 +793,7 @@
 
               <div class="mt-5 text-[13px] text-mute dark:text-[#9C9CA3]">
                 Try:
-                <template x-for="ex in ['Morphine','Paracetamol','Amoxicillin','Caffeine']" :key="ex">
+                <template x-for="ex in ['Morphine','Paracetamol','Amoxicillin','Caffein']" :key="ex">
                   <button type="button" @click="ingQuery = ex; searchIngredient()" class="text-ink dark:text-snow underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow mx-1 transition-colors" x-text="ex"></button>
                 </template>
               </div>
@@ -1011,14 +1011,6 @@
                               <div x-show="pdb.receptor_file_name" class="flex items-center justify-between gap-4 py-3.5">
                                 <dt class="font-mono text-xs uppercase tracking-[0.1em] text-mute dark:text-[#9C9CA3]">Receptor file</dt>
                                 <dd class="font-mono text-xs text-right truncate max-w-[60%]" x-text="pdb.receptor_file_name"></dd>
-                              </div>
-                              <div class="flex items-center justify-between gap-4 py-3.5">
-                                <dt class="font-mono text-xs uppercase tracking-[0.1em] text-mute dark:text-[#9C9CA3]">Ligands extracted</dt>
-                                <dd class="font-semibold">
-                                  <a x-show="pdb.ligands && pdb.ligands.length > 0" href="#ligand-files"
-                                     class="underline underline-offset-4 decoration-hair dark:decoration-dhair hover:decoration-ink dark:hover:decoration-snow transition-colors" x-text="pdb.ligands.length + ' — view below'"></a>
-                                  <span x-show="!pdb.ligands || pdb.ligands.length === 0" class="font-semibold">0</span>
-                                </dd>
                               </div>
                             </dl>
                           </div>
